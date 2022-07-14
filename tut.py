@@ -1,5 +1,6 @@
 import time
 import datetime
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDialog, QHBoxLayout, QLabel, QLineEdit, QProgressBar,
                              QPushButton, QVBoxLayout, QAction, QTableWidget, QTableWidgetItem,
@@ -8,23 +9,28 @@ import pyodbc
 from PyQt5.QtWidgets import qApp
 from PyQt5.QtGui import QIcon, QPalette
 
+import tkinter
+
 
 class WidgetGallery(QMainWindow):
     def __init__(self, parent=None):
         super(WidgetGallery, self).__init__(parent)
         # Main window
-        self.WIDTH = 1300
-        self.HIGHT = 800
-        self.setGeometry(350, 150, self.WIDTH, self.HIGHT)
+        root = tkinter.Tk()
+        self.WIDTH = root.winfo_screenwidth()-240
+        self.HEIGHT = root.winfo_screenheight()-200
+        self.center_w=root.winfo_reqwidth()
+        self.center_h=root.winfo_reqheight()
+        self.setGeometry(self.center_w-100, self.center_h-100, self.WIDTH, self.HEIGHT)
         self.setWindowTitle("I.L.M. - I LOVE MOVIES v0.2")
         self.setWindowIcon(QIcon('ILF.ico'))
-        self.setFixedSize(self.WIDTH, self.HIGHT)
+        self.setFixedSize(self.WIDTH, self.HEIGHT)
 
         # Main lines (Name, Mark, Status, Category)
         # Name
         self.txt1 = QLineEdit(self)
         self.txt1.setPlaceholderText("Название")
-        self.create_textline(self.txt1, 20, 30, 280, 40, 25)
+        self.create_textline(self.txt1, 20, 30, 200, 30, 16)
 
         # Mark
         self.txt2 = QComboBox(self)
@@ -34,25 +40,25 @@ class WidgetGallery(QMainWindow):
             else:
                 num=int(num/10)
             self.txt2.addItem(str(num))
-        self.create_textline(self.txt2, 20, 80, 280, 40,25)
+        self.create_textline(self.txt2, 20, 65, 200, 30,16)
 
         #Status
         self.txt3 = QComboBox(self)
         self.txt3.addItem("Завершено")
         self.txt3.addItem("Не завершено")
-        self.create_textline(self.txt3, 20, 130, 280, 40, 25)
+        self.create_textline(self.txt3, 20, 100, 200, 30, 16)
 
         #Category
         self.txt4 = QComboBox(self)
         self.txt4.addItem("Фильм/Сериал")
         self.txt4.addItem("Книга")
         self.txt4.addItem("Игра")
-        self.create_textline(self.txt4, 20, 180, 280, 40, 25)
+        self.create_textline(self.txt4, 20, 135, 200, 30, 16)
 
         # Range deleting group
-        self.groupbox = QGroupBox("Включить диапазон удаления", self)
+        self.groupbox = QGroupBox("Включить удаление диапазона", self)
         self.groupbox.setCheckable(True)
-        self.groupbox.move(990, 240)
+        self.groupbox.move(830, 30)
         self.groupbox.autoFillBackground()
         Ran_m1 = '''
                                  QGroupBox {
@@ -60,7 +66,7 @@ class WidgetGallery(QMainWindow):
                                      spacing: 5px;
                                      font-size:12px;
                                      min-width: 280px;
-                                     min-height:10em;
+                                     min-height:50px;
                                      border: 2px solid gray;
                                      border-radius: 5px;
                                  }
@@ -75,7 +81,7 @@ class WidgetGallery(QMainWindow):
         #One by one deleting group
         self.groupbox2 = QGroupBox("Включить удаление по списку", self)
         self.groupbox2.setCheckable(True)
-        self.groupbox2.move(990, 410)
+        self.groupbox2.move(830, 90)
         self.groupbox2.autoFillBackground()
         List_m2 = '''
                                          QGroupBox {
@@ -83,7 +89,7 @@ class WidgetGallery(QMainWindow):
                                              spacing: 5px;
                                              font-size:12px;
                                              min-width: 280px;
-                                             min-height:20em;
+                                             min-height:140px;
                                              border: 2px solid gray;
                                              border-radius: 5px;
                                          }
@@ -101,26 +107,33 @@ class WidgetGallery(QMainWindow):
         self.table.setRowCount(5)
         self.table.move(20, 240)
 
-        self.table.setColumnWidth(0, 380)
-        self.table.setColumnWidth(1, 60)
-        self.table.setColumnWidth(2, 150)
-        self.table.setColumnWidth(3, 150)
-        self.table.setColumnWidth(4, 190)
+        L=(self.WIDTH-35)
+        LENGTH_Name = L*0.45
+        LENGTH_Mark = L*0.1
+        LENGTH_Status = L*0.15
+        LENGTH_Category = L*0.15
+        LENGTH_Date = L*0.12
 
-        self.table.setMinimumWidth(950)
-        self.table.setMinimumHeight(self.HIGHT-250)
+        self.table.setColumnWidth(0, int(LENGTH_Name))
+        self.table.setColumnWidth(1, int(LENGTH_Mark))
+        self.table.setColumnWidth(2, int(LENGTH_Status))
+        self.table.setColumnWidth(3, int(LENGTH_Category))
+        self.table.setColumnWidth(4, int(LENGTH_Date))
+
+        self.table.setMinimumWidth(L)
+        self.table.setMinimumHeight(self.HEIGHT-250)
         self.table.setHorizontalHeaderLabels(["Название", "Оценка", "Статус","Категория","Дата добавления"])
 
         self.create_table(self.table)
 
         # Button
         self.btn1 = QPushButton("Добавить", self)
-        self.create_button(self.btn1, 320, 30, 200, 40,20)
+        self.create_button(self.btn1, 40, 175, 160, 30, 16)
         self.btn1.clicked.connect(lambda: self.add_func())
 
         # Check boxes
         self.type_adding_btn= QCheckBox("Включить проверку поля",self)
-        self.create_textline(self.type_adding_btn, 320, 80, 280, 40, 14)
+        self.create_textline(self.type_adding_btn, 40, 205, 200, 30, 12)
 
         # Progress bar
         self.pbar = QProgressBar(self)
@@ -153,27 +166,27 @@ class WidgetGallery(QMainWindow):
         # Search line
         self.srch_t = QLineEdit(self)
         self.srch_t.setPlaceholderText("Поиск")
-        self.create_textline(self.srch_t, 550, 30, 230, 40, 20)
+        self.create_textline(self.srch_t, 230, 30, 200, 30, 16)
 
         # Search button
         self.srch_b = QPushButton(self)
         self.srch_b.setIcon(QIcon('search.svg'))
-        self.create_button(self.srch_b, 800, 30, 40, 40, 20)
+        self.create_button(self.srch_b, 440, 30, 30, 30, 16)
         self.srch_b.clicked.connect(lambda: self.search_func())
 
         # Filters
         self.groupbox3 = QGroupBox("Фильтры", self)
         self.groupbox3.setCheckable(True)
         self.groupbox3.setChecked(False)
-        self.groupbox3.move(550, 80)
+        self.groupbox3.move(230, 70)
         self.groupbox3.autoFillBackground()
         Ran_m3 = '''
                                                          QGroupBox {
                                                              background-color: white;
                                                              spacing: 5px;
                                                              font-size:12px;
-                                                             min-width: 285px;
-                                                             min-height:100px;
+                                                             min-width: 220px;
+                                                             min-height:120px;
                                                              border: 2px solid gray;
                                                              border-radius: 5px;
                                                          }
@@ -186,32 +199,32 @@ class WidgetGallery(QMainWindow):
 
         self.found_data = QLabel(self)
         self.count_found_data=0
-        self.create_textline(self.found_data, 550, 180, 250, 50, 20)
+        self.create_textline(self.found_data, 230, 190, 250, 50, 20)
         self.found_data.setText(f"Совпадений найдено: {self.count_found_data}")
 
         # Filter "Name"
         self.filter_name = QCheckBox("Название", self.groupbox3)
-        self.create_textline(self.filter_name, 30, 30, 280, 40, 14)
+        self.create_textline(self.filter_name, 10, 20, 280, 40, 12)
 
         # Filter "Mark"
         self.filter_mark = QCheckBox("Оценка", self.groupbox3)
-        self.create_textline(self.filter_mark, 30, 60, 280, 40, 14)
+        self.create_textline(self.filter_mark, 10, 50, 280, 40, 12)
 
         # Filter "Status"
         self.filter_status = QCheckBox("Статус", self.groupbox3)
-        self.create_textline(self.filter_status, 150, 0, 280, 40, 14)
+        self.create_textline(self.filter_status, 10, 80, 280, 40, 12)
 
         # Filter "Category"
         self.filter_category = QCheckBox("Категория", self.groupbox3)
-        self.create_textline(self.filter_category, 150, 30, 280, 40, 14)
+        self.create_textline(self.filter_category, 100, 20, 280, 40, 12)
 
         # Filter "Date"
         self.filter_time = QCheckBox("Дата", self.groupbox3)
-        self.create_textline(self.filter_time, 150, 60, 280, 40, 14)
+        self.create_textline(self.filter_time, 100, 50, 280, 40, 12)
 
         # Terminal for searching results
         self.search_terminal = QListWidget(self)
-        self.create_textline(self.search_terminal, 850, 30, 435, 190, 14)
+        self.create_textline(self.search_terminal, 480, 30, 335, 190, 14)
     def menubar(self):
         # Function for creating menu bar
         # Exit action
@@ -325,31 +338,31 @@ class WidgetGallery(QMainWindow):
 
         # Label and text line where you have to enter data for deleting
         self.list_l1 = QLabel(self.groupbox2)
-        self.create_textline(self.list_l1, 10, 30, 80, 40,25)
+        self.create_textline(self.list_l1, 10, 15, 80, 40,16)
         self.list_l1.setText("Строка")
 
         self.list_t1 = QLineEdit(self.groupbox2)
-        self.create_textline(self.list_t1, 100, 30, 80, 40,25)
-
-        # Space where shows data for deleting
-        self.list_t2 = QListWidget(self.groupbox2)
-        self.create_textline(self.list_t2, 20, 150, 245, 115,14)
+        self.create_textline(self.list_t1, 75, 27, 80, 20,14)
 
         # Add deleting data button
         self.list_b1 = QPushButton("+", self.groupbox2)
-        self.create_button(self.list_b1, 200, 30, 40, 40,20)
+        self.create_button(self.list_b1, 170, 27, 20, 20, 12)
         self.list_b1.clicked.connect(lambda: self.add_in_delList(self.list_t1.text()))
 
         # Clear list with deleting data
         self.list_b2 = QPushButton("Очистить", self.groupbox2)
-        self.create_button(self.list_b2, 30, 85, 100, 45,20)
+        self.create_button(self.list_b2, 210, 10, 60, 20, 10)
         self.list_b2.clicked.connect(lambda: (self.list_nums.clear(), self.list_t2.clear()))
 
         # Delete button
-        self.list_nums=[]
-        self.list_b3 = QPushButton("Удалить", self.groupbox2)
-        self.create_button(self.list_b3, 150, 85, 100, 45,20)
+        self.list_nums = []
+        self.list_b3 = QPushButton("Старт", self.groupbox2)
+        self.create_button(self.list_b3, 210, 35, 60, 20, 10)
         self.list_b3.clicked.connect(lambda: self.delete_list_of_rows())
+
+        # Space where shows data for deleting
+        self.list_t2 = QListWidget(self.groupbox2)
+        self.create_textline(self.list_t2, 20, 60, 245, 70,14)
     def check_empty_pole(self):
         # Function for checking is Name pole empty or not
         txt1 = self.txt1.text()
@@ -388,7 +401,7 @@ class WidgetGallery(QMainWindow):
             try:
                 # Connecting to db
                 con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                             r'DBQ=C:\Users\zheny\PycharmProjects\pythonProject\ILF.accdb;'
+                             r'DBQ=C:\Users\User\Desktop\pythonProject\ILF.accdb;'
                 conn = pyodbc.connect(con_string)
                 cursor = conn.cursor()
                 for row in range(0, self.table.rowCount()):
@@ -424,7 +437,7 @@ class WidgetGallery(QMainWindow):
         try:
             # Connecting to db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=C:\Users\zheny\PycharmProjects\pythonProject\ILF.accdb;'
+                         r'DBQ=C:\Users\User\Desktop\pythonProject\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cursor = conn.cursor()
             # Adding data in db
@@ -450,7 +463,7 @@ class WidgetGallery(QMainWindow):
         try:
             # Connecting to db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=C:\Users\zheny\PycharmProjects\pythonProject\ILF.accdb;'
+                         r'DBQ=C:\Users\User\Desktop\pythonProject\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cur = conn.cursor()
             # Selecting Name column from db
@@ -535,27 +548,27 @@ class WidgetGallery(QMainWindow):
         # This function is for creating objects in the group 1 (range deleting)
         # Label "From"
         self.ran_l1=QLabel(self.groupbox)
-        self.create_textline(self.ran_l1, 10,30, 80, 40,25)
+        self.create_textline(self.ran_l1, 10, 20, 80, 30, 16)
         self.ran_l1.setText("От")
         # Label "To"
         self.ran_l2 = QLabel(self.groupbox)
-        self.create_textline(self.ran_l2, 140, 30, 80, 40,25)
+        self.create_textline(self.ran_l2, 110, 20, 80, 30, 16)
         self.ran_l2.setText("До")
         # Text line for "From" data
         self.ran_t1=QLineEdit(self.groupbox)
-        self.create_textline(self.ran_t1, 50,30, 80, 40,25)
+        self.create_textline(self.ran_t1, 40, 25, 60, 20, 14)
         # Text line for "To" data
         self.ran_t2 = QLineEdit(self.groupbox)
-        self.create_textline(self.ran_t2, 175, 30, 80, 40,25)
+        self.create_textline(self.ran_t2, 140, 25, 60, 20,14)
         # Start deleting button
-        self.ran_b1 = QPushButton("Запустить удаление", self.groupbox)
-        self.create_button(self.ran_b1, 30, 85, 220, 45,20)
+        self.ran_b1 = QPushButton("Запустить\nудаление", self.groupbox)
+        self.create_button(self.ran_b1, 210, 10, 60, 35, 10)
         self.ran_b1.clicked.connect(lambda: self.delete_range(self.ran_t1.text(),self.ran_t2.text()))
     def search_func(self):
         try:
             # Connection to db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=C:\Users\zheny\PycharmProjects\pythonProject\ILF.accdb;'
+                         r'DBQ=C:\Users\User\Desktop\pythonProject\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cur = conn.cursor()
             # Selecting data from db
