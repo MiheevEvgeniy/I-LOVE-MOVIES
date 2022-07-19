@@ -1,13 +1,18 @@
 import time
 import datetime
+import sys
+import configparser
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDialog, QHBoxLayout, QLabel, QLineEdit, QProgressBar,
-                             QPushButton, QVBoxLayout, QAction, QTableWidget, QTableWidgetItem,
-                             QMainWindow, QApplication, QComboBox,  QListWidget,QGroupBox, QCheckBox,QMessageBox)
+                             QPushButton, QVBoxLayout, QAction,
+                             QTableWidget, QTableWidgetItem,
+                             QMainWindow, QApplication, QComboBox,
+                             QListWidget,QGroupBox, QCheckBox,
+                             QMessageBox,QColorDialog)
 import pyodbc
 from PyQt5.QtWidgets import qApp
-from PyQt5.QtGui import QIcon, QPalette
+from PyQt5.QtGui import QIcon, QPalette, QColor
 
 import tkinter
 
@@ -17,19 +22,21 @@ class WidgetGallery(QMainWindow):
         super(WidgetGallery, self).__init__(parent)
         # Main window
         root = tkinter.Tk()
+        self.config = configparser.ConfigParser()
+        self.config.read("config.ini")
+
         self.WIDTH = root.winfo_screenwidth()-240
         self.HEIGHT = root.winfo_screenheight()-200
         self.center_w=root.winfo_reqwidth()
         self.center_h=root.winfo_reqheight()
         self.setGeometry(self.center_w-100, self.center_h-100, self.WIDTH, self.HEIGHT)
-        self.setWindowTitle("I.L.M. - I LOVE MOVIES v0.2")
+        self.setWindowTitle("I.L.M. - I LOVE MOVIES v0.3")
         self.setWindowIcon(QIcon('ILF.ico'))
         self.setFixedSize(self.WIDTH, self.HEIGHT)
 
         # Main lines (Name, Mark, Status, Category)
         # Name
         self.txt1 = QLineEdit(self)
-        self.txt1.setPlaceholderText("Название")
         self.create_textline(self.txt1, 20, 30, 200, 30, 16)
 
         # Mark
@@ -44,19 +51,14 @@ class WidgetGallery(QMainWindow):
 
         #Status
         self.txt3 = QComboBox(self)
-        self.txt3.addItem("Завершено")
-        self.txt3.addItem("Не завершено")
         self.create_textline(self.txt3, 20, 100, 200, 30, 16)
 
         #Category
         self.txt4 = QComboBox(self)
-        self.txt4.addItem("Фильм/Сериал")
-        self.txt4.addItem("Книга")
-        self.txt4.addItem("Игра")
         self.create_textline(self.txt4, 20, 135, 200, 30, 16)
 
         # Range deleting group
-        self.groupbox = QGroupBox("Включить удаление диапазона", self)
+        self.groupbox = QGroupBox(self)
         self.groupbox.setCheckable(True)
         self.groupbox.move(830, 30)
         self.groupbox.autoFillBackground()
@@ -76,10 +78,10 @@ class WidgetGallery(QMainWindow):
                                  }
                                  '''
         self.groupbox.setStyleSheet(Ran_m1)
-        self.Range_group()
+        self.range_group()
 
         #One by one deleting group
-        self.groupbox2 = QGroupBox("Включить удаление по списку", self)
+        self.groupbox2 = QGroupBox(self)
         self.groupbox2.setCheckable(True)
         self.groupbox2.move(830, 90)
         self.groupbox2.autoFillBackground()
@@ -122,29 +124,28 @@ class WidgetGallery(QMainWindow):
 
         self.table.setMinimumWidth(L)
         self.table.setMinimumHeight(self.HEIGHT-250)
-        self.table.setHorizontalHeaderLabels(["Название", "Оценка", "Статус","Категория","Дата добавления"])
 
         self.create_table(self.table)
 
         # Button
-        self.btn1 = QPushButton("Добавить", self)
+        self.btn1 = QPushButton(self)
         self.create_button(self.btn1, 40, 175, 160, 30, 16)
         self.btn1.clicked.connect(lambda: self.add_func())
 
         # Check boxes
-        self.type_adding_btn= QCheckBox("Включить проверку поля",self)
+        self.type_adding_btn= QCheckBox(self)
         self.create_textline(self.type_adding_btn, 40, 205, 200, 30, 12)
 
         # Progress bar
         self.pbar = QProgressBar(self)
         self.pbar.setValue(0)
-        self.pbar.setGeometry(990, 710, 280, 45)
+        self.pbar.setGeometry(480, 225, 335, 10)
         pbar_style="""
                 QProgressBar {
                         border: 2px solid grey;
                         border-radius: 5px;
                         text-align: center;
-                        font-size: 25px;
+                        font-size: 10px;
                 }
                 QProgressBar::chunk {
                         background-color: #CD96CD;
@@ -162,10 +163,16 @@ class WidgetGallery(QMainWindow):
         self.menubar()
         # Search system
         self.searching_sys()
+        if self.config["application"]["language"] == 'rus':
+            self.Current_lan = "Русский"
+            self.change_language(self.Current_lan)
+
+        if self.config["application"]["language"] == 'eng':
+            self.Current_lan = "English"
+            self.change_language(self.Current_lan)
     def searching_sys(self):
         # Search line
         self.srch_t = QLineEdit(self)
-        self.srch_t.setPlaceholderText("Поиск")
         self.create_textline(self.srch_t, 230, 30, 200, 30, 16)
 
         # Search button
@@ -175,9 +182,8 @@ class WidgetGallery(QMainWindow):
         self.srch_b.clicked.connect(lambda: self.search_func())
 
         # Filters
-        self.groupbox3 = QGroupBox("Фильтры", self)
+        self.groupbox3 = QGroupBox(self)
         self.groupbox3.setCheckable(True)
-        self.groupbox3.setChecked(False)
         self.groupbox3.move(230, 70)
         self.groupbox3.autoFillBackground()
         Ran_m3 = '''
@@ -200,31 +206,36 @@ class WidgetGallery(QMainWindow):
         self.found_data = QLabel(self)
         self.count_found_data=0
         self.create_textline(self.found_data, 230, 190, 250, 50, 20)
-        self.found_data.setText(f"Совпадений найдено: {self.count_found_data}")
+
+        self.found_data_value = QLabel(self)
+        self.create_textline(self.found_data_value, 440, 190, 250, 50, 20)
+        self.found_data_value.setText(f"{self.count_found_data}")
 
         # Filter "Name"
-        self.filter_name = QCheckBox("Название", self.groupbox3)
+        self.filter_name = QCheckBox(self.groupbox3)
         self.create_textline(self.filter_name, 10, 20, 280, 40, 12)
 
         # Filter "Mark"
-        self.filter_mark = QCheckBox("Оценка", self.groupbox3)
+        self.filter_mark = QCheckBox(self.groupbox3)
         self.create_textline(self.filter_mark, 10, 50, 280, 40, 12)
 
         # Filter "Status"
-        self.filter_status = QCheckBox("Статус", self.groupbox3)
+        self.filter_status = QCheckBox(self.groupbox3)
         self.create_textline(self.filter_status, 10, 80, 280, 40, 12)
 
         # Filter "Category"
-        self.filter_category = QCheckBox("Категория", self.groupbox3)
+        self.filter_category = QCheckBox(self.groupbox3)
         self.create_textline(self.filter_category, 100, 20, 280, 40, 12)
 
         # Filter "Date"
-        self.filter_time = QCheckBox("Дата", self.groupbox3)
+        self.filter_time = QCheckBox(self.groupbox3)
         self.create_textline(self.filter_time, 100, 50, 280, 40, 12)
 
         # Terminal for searching results
         self.search_terminal = QListWidget(self)
         self.create_textline(self.search_terminal, 480, 30, 335, 190, 14)
+
+        self.load_settings()
     def menubar(self):
         # Function for creating menu bar
         # Exit action
@@ -245,14 +256,164 @@ class WidgetGallery(QMainWindow):
         info_action.setStatusTip('Show information about program')
         info_action.triggered.connect(self.info_menu)
 
+        # Settings action
+        settings_action = QAction(QIcon('settings.svg'), '&Settings', self)
+        settings_action.setShortcut('Ctrl+E')
+        settings_action.setStatusTip('Program settings')
+        settings_action.triggered.connect(self.settings_menu)
+
         # Menu bar and adding actions on it
         menubar = self.menuBar()
         file_menu = menubar.addMenu('&File')
         file_menu.addAction(exit_action)
         file_menu.addAction(save_action)
+        file_menu.addAction(settings_action)
 
         info_menu = menubar.addMenu('&Info')
         info_menu.addAction(info_action)
+    def settings_menu(self):
+        # Settings window for menu bar
+        self.st_menu = QDialog()
+        self.st_menu.setFixedSize(800, 400)
+        self.st_menu.setWindowTitle("Settings")
+        self.st_menu.setWindowIcon(QIcon('settings.svg'))
+        self.st_menu.setWindowModality(Qt.ApplicationModal)
+
+        self.lbl = QLabel(self.st_menu)
+        self.create_textline(self.lbl, 30, 30, 200, 30, 16)
+        self.create_textline(self.lbl, self.num_x_lan, 30, 200, 30, 16)
+        self.lbl.setText(self.lan_setting)
+
+        self.lan = QComboBox(self.st_menu)
+        self.create_textline(self.lan, 150, 30, 100, 30, 16)
+        self.lan.addItem("Русский")
+        self.lan.addItem("English")
+        self.lan.setCurrentText(self.Current_lan)
+
+
+
+        self.lbl1 = QLabel(self.st_menu)
+        self.create_textline(self.lbl1, self.num_x_font, self.num_x2_font, 200, 45, 16)
+        self.lbl1.setText(self.font_setting)
+
+        self.new_font = QLineEdit(self.st_menu)
+        self.create_textline(self.new_font, 150, 75, 40, 30, 16)
+
+        def chan_lag():
+            self.change_language(self.lan.currentText())
+            self.create_textline(self.lbl, self.num_x_lan, 30, 200, 30, 16)
+            self.lbl.setText(self.lan_setting)
+            self.lbl1.setText(self.font_setting)
+        self.lan.currentTextChanged.connect(lambda: chan_lag())
+
+        self.st_menu.exec_()
+    def change_language(self, type):
+        if type == "English":
+            self.txt1.setPlaceholderText("Name")
+            self.lan_setting = "Change language"
+            self.num_x_lan = 15
+            self.Current_lan = "English"
+            self.font_setting = "Change font size"
+            self.num_x_font = 20
+            self.num_x2_font = 70
+
+            self.txt3.clear()
+            self.txt3.addItem("Finished")
+            self.txt3.addItem("Not finished")
+
+            self.txt4.clear()
+            self.txt4.addItem("Film/Series")
+            self.txt4.addItem("Book")
+            self.txt4.addItem("Game")
+
+            self.groupbox.setTitle("Turn on range deleting")
+            self.groupbox2.setTitle("Turn on list deleting")
+            self.groupbox3.setTitle("Filters")
+
+            self.filter_name.setText("Name")
+            self.filter_mark.setText("Mark")
+            self.filter_status.setText("Status")
+            self.filter_category.setText("Category")
+            self.filter_time.setText("Date")
+
+            self.table.setHorizontalHeaderLabels(["Name", "Mark", "Status", "Category", "Date"])
+
+            self.btn1.setText("Add")
+
+            self.type_adding_btn.setText("Turn on checking pole")
+
+            self.srch_t.setPlaceholderText("Search")
+
+            self.found_data.setText(f"Coincidences found: ")
+            self.create_textline(self.found_data_value, 420, 190, 250, 50, 20)
+
+            self.list_l1.setText("Line")
+            self.create_textline(self.list_l1, 30, 15, 80, 40, 16)
+            self.list_b2.setText("Clear")
+            self.list_b3.setText("Start")
+
+            self.ran_l1.setText("From")
+            self.create_textline(self.ran_t1, 50, 25, 50, 20, 14)
+            self.ran_l2.setText("To")
+            self.ran_b1.setText("Start\ndeleting")
+
+            self.config.set("application", "language", "eng")
+
+            self.exit_word = "Exit"
+            self.exit_sentence = "Exit with saving?"
+        if type == "Русский":
+            self.lan_setting = "Сменить язык"
+            self.num_x_lan = 30
+            self.Current_lan = "Русский"
+            self.font_setting = "Изменить размер\n   шрифта"
+            self.num_x_font = 15
+            self.num_x2_font = 75
+
+            self.txt1.setPlaceholderText("Название")
+
+            self.txt3.clear()
+            self.txt3.addItem("Завершено")
+            self.txt3.addItem("Не завершено")
+
+            self.txt4.clear()
+            self.txt4.addItem("Фильм/Сериал")
+            self.txt4.addItem("Книга")
+            self.txt4.addItem("Игра")
+
+            self.groupbox.setTitle("Включить удаление диапазона")
+            self.groupbox2.setTitle("Включить удаление по списку")
+            self.groupbox3.setTitle("Фильтры")
+
+            self.filter_name.setText("Название")
+            self.filter_mark.setText("Оценка")
+            self.filter_status.setText("Статус")
+            self.filter_category.setText("Категория")
+            self.filter_time.setText("Дата")
+
+            self.table.setHorizontalHeaderLabels(["Название", "Оценка", "Статус", "Категория", "Дата"])
+
+            self.btn1.setText("Добавить")
+
+            self.type_adding_btn.setText("Включить проверку поля")
+
+            self.srch_t.setPlaceholderText("Поиск")
+
+            self.found_data.setText(f"Совпадений найдено: ")
+            self.create_textline(self.found_data_value, 440, 190, 250, 50, 20)
+
+            self.list_l1.setText("Строка")
+            self.create_textline(self.list_l1, 15, 15, 70, 40, 16)
+            self.list_b2.setText("Очистить")
+            self.list_b3.setText("Старт")
+
+            self.ran_l1.setText("От")
+            self.create_textline(self.ran_t1, 40, 25, 60, 20, 14)
+            self.ran_l2.setText("До")
+            self.ran_b1.setText("Запустить\nудаление")
+
+            self.exit_word = "Выход"
+            self.exit_sentence= "Выйти с сохранением данных?"
+            self.config.set("application", "language", "rus")
     def info_menu(self):
         # Info window for menu bar
         self.reply = QDialog()
@@ -262,7 +423,8 @@ class WidgetGallery(QMainWindow):
         label_dialog = QLabel()
 
         self.reply.setWindowTitle("Information")
-        self.reply.setWindowIcon(QIcon('Info.ico'))
+        self.reply.setWindowIcon(QIcon('info.svg'))
+        self.reply.setWindowModality(Qt.ApplicationModal)
 
         palette = QPalette()
         palette.setColor(QPalette.Button, Qt.yellow)
@@ -303,7 +465,7 @@ class WidgetGallery(QMainWindow):
         try:
             # Loading db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=C:\Users\zheny\PycharmProjects\pythonProject\ILF.accdb;'
+                         r'DBQ=C:\Users\User\Desktop\pythonProject\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cursor = conn.cursor()
             # Taking count of rows and deleting data from text line
@@ -339,24 +501,23 @@ class WidgetGallery(QMainWindow):
         # Label and text line where you have to enter data for deleting
         self.list_l1 = QLabel(self.groupbox2)
         self.create_textline(self.list_l1, 10, 15, 80, 40,16)
-        self.list_l1.setText("Строка")
 
         self.list_t1 = QLineEdit(self.groupbox2)
         self.create_textline(self.list_t1, 75, 27, 80, 20,14)
 
         # Add deleting data button
-        self.list_b1 = QPushButton("+", self.groupbox2)
+        self.list_b1 = QPushButton(self.groupbox2)
         self.create_button(self.list_b1, 170, 27, 20, 20, 12)
         self.list_b1.clicked.connect(lambda: self.add_in_delList(self.list_t1.text()))
 
         # Clear list with deleting data
-        self.list_b2 = QPushButton("Очистить", self.groupbox2)
+        self.list_b2 = QPushButton(self.groupbox2)
         self.create_button(self.list_b2, 210, 10, 60, 20, 10)
         self.list_b2.clicked.connect(lambda: (self.list_nums.clear(), self.list_t2.clear()))
 
         # Delete button
         self.list_nums = []
-        self.list_b3 = QPushButton("Старт", self.groupbox2)
+        self.list_b3 = QPushButton(self.groupbox2)
         self.create_button(self.list_b3, 210, 35, 60, 20, 10)
         self.list_b3.clicked.connect(lambda: self.delete_list_of_rows())
 
@@ -535,25 +696,24 @@ class WidgetGallery(QMainWindow):
     def closeEvent(self,event):
         # Program Closing window
         close = QMessageBox.question(self,
-                                               "Выход",
-                                               "Выйти с сохранением данных?",
+                                               self.exit_word,
+                                               self.exit_sentence,
                                                QMessageBox.Yes | QMessageBox.Cancel)
 
         if close == QMessageBox.Yes:
             self.save_func()
+            self.save_setings()
             event.accept()
         if close == QMessageBox.Cancel:
             event.ignore()
-    def Range_group(self):
+    def range_group(self):
         # This function is for creating objects in the group 1 (range deleting)
         # Label "From"
         self.ran_l1=QLabel(self.groupbox)
         self.create_textline(self.ran_l1, 10, 20, 80, 30, 16)
-        self.ran_l1.setText("От")
         # Label "To"
         self.ran_l2 = QLabel(self.groupbox)
         self.create_textline(self.ran_l2, 110, 20, 80, 30, 16)
-        self.ran_l2.setText("До")
         # Text line for "From" data
         self.ran_t1=QLineEdit(self.groupbox)
         self.create_textline(self.ran_t1, 40, 25, 60, 20, 14)
@@ -561,7 +721,7 @@ class WidgetGallery(QMainWindow):
         self.ran_t2 = QLineEdit(self.groupbox)
         self.create_textline(self.ran_t2, 140, 25, 60, 20,14)
         # Start deleting button
-        self.ran_b1 = QPushButton("Запустить\nудаление", self.groupbox)
+        self.ran_b1 = QPushButton(self.groupbox)
         self.create_button(self.ran_b1, 210, 10, 60, 35, 10)
         self.ran_b1.clicked.connect(lambda: self.delete_range(self.ran_t1.text(),self.ran_t2.text()))
     def search_func(self):
@@ -638,7 +798,7 @@ class WidgetGallery(QMainWindow):
                             break
             # If nothing found then print it in list
 
-            self.found_data.setText(f"Совпадений найдено: {self.count_found_data}")
+            self.found_data_value.setText(f"{self.count_found_data}")
             self.count_found_data = 0
         except Exception as ex:
                 print("не дела...")
@@ -679,15 +839,122 @@ class WidgetGallery(QMainWindow):
         except Exception as ex:
             print("не дела...")
             print(ex)
+    def load_settings(self):
+        if self.config["application"]["filter_name"] == '1':
+            self.filter_name.setChecked(False)
+        else:
+            self.filter_name.setChecked(True)
 
+        if self.config["application"]["filter_mark"] == '1':
+            self.filter_mark.setChecked(False)
+        else:
+            self.filter_mark.setChecked(True)
 
-# сохранение настроек в бд
-# предотвратить открытие кучи окон сразу
+        if self.config["application"]["filter_status"] == '1':
+            self.filter_status.setChecked(False)
+        else:
+            self.filter_status.setChecked(True)
+
+        if self.config["application"]["filter_category"] == '1':
+            self.filter_category.setChecked(False)
+        else:
+            self.filter_category.setChecked(True)
+
+        if self.config["application"]["filter_date"] == '1':
+            self.filter_time.setChecked(False)
+        else:
+            self.filter_time.setChecked(True)
+
+        if self.config["application"]["check_add_func"] == '1':
+            self.type_adding_btn.setChecked(False)
+        else:
+            self.type_adding_btn.setChecked(True)
+
+        if self.config["application"]["filters_is_on"] == '1':
+            self.groupbox3.setChecked(False)
+        else:
+            self.groupbox3.setChecked(True)
+
+        if self.config["application"]["list_del_is_on"] == '1':
+            self.groupbox2.setChecked(False)
+        else:
+            self.groupbox2.setChecked(True)
+
+        if self.config["application"]["range_del_is_on"] == '1':
+            self.groupbox.setChecked(False)
+        else:
+            self.groupbox.setChecked(True)
+    def save_setings(self):
+        if self.groupbox3.isChecked()==True:
+            self.config.set("application", "filters_is_on", "0")
+        else:
+            self.config.set("application", "filters_is_on", "1")
+
+        if self.groupbox2.isChecked()==True:
+            self.config.set("application", "list_del_is_on", "0")
+        else:
+            self.config.set("application", "list_del_is_on", "1")
+
+        if self.groupbox.isChecked()==True:
+            self.config.set("application", "range_del_is_on", "0")
+        else:
+            self.config.set("application", "range_del_is_on", "1")
+
+        if self.filter_name.isChecked()==True:
+            self.config.set("application", "filter_name", "0")
+        else:
+            self.config.set("application", "filter_name", "1")
+
+        if self.filter_mark.isChecked()==True:
+            self.config.set("application", "filter_mark", "0")
+        else:
+            self.config.set("application", "filter_mark", "1")
+
+        if self.filter_status.isChecked()==True:
+            self.config.set("application", "filter_status", "0")
+        else:
+            self.config.set("application", "filter_status", "1")
+
+        if self.filter_category.isChecked()==True:
+            self.config.set("application", "filter_category", "0")
+        else:
+            self.config.set("application", "filter_category", "1")
+
+        if self.filter_time.isChecked()==True:
+            self.config.set("application", "filter_date", "0")
+        else:
+            self.config.set("application", "filter_date", "1")
+
+        if self.type_adding_btn.isChecked()==True:
+            self.config.set("application", "check_add_func", "0")
+        else:
+            self.config.set("application", "check_add_func", "1")
+        with open('config.ini', 'w') as configfile:  # save
+            self.config.write(configfile)
 
 # постеры или описание
 # разделить программу на классы
 
 # сделать переключение между таблицами разных категорий
+# доделать поле для выхода
+# установить фон для терминала системы поиска
+
+# в настройках знак вопроса (иконка) - дать функционал
+# сделать смену языка ******
+# в русской версии сделать окно выхода тоже на русском (выбор - да, отмена)
+
+# окно для настроек(глобальных) и разбить на группы(основное, вид и т.д.):
+"""
+1) включение/выключение очистки полей в месте удаления данных
+2) выбор языка -------------
+3) отключение предупреждения при выходе
+4) установка цвета закрузочной полосы
+5) смена стилей приложения
+6) изменение размера шрифта в разных областях программы (или на все)------------
+7) перевести информацию из таблицы в отдельный файл (txt, excel)
+8) Темная тема (вкл/выкл)
+"""
+
 
 # сделать apk и попробовать удалить бд
 # ЗАДЕЛ НА БУДУЩЕЕ!! КОРОЧ, СОЗДАТЬ ОТДЕЛЬНОЕ ОКНО С НАСТРОЙКАМИ
@@ -695,11 +962,12 @@ class WidgetGallery(QMainWindow):
 # КОРОЧ, ЕЩЕ ОДНА КРУТАЯ ИДЕЯ!!!!!!! МОЖНО СОЗДАВАТЬ СТИИИИИИЛЛИИИИ!!! ОАОАОАОАОАОАОА
 
 if __name__ == '__main__':
-    import sys
+
+    config = configparser.ConfigParser()
+    config.read("config.ini")
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     gallery = WidgetGallery()
-
     gallery.show()
     sys.exit(app.exec_())
 
