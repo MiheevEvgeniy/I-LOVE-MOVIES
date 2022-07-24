@@ -996,7 +996,7 @@ class App(QMainWindow,Options,Systems,Saving,Loading,Adding,Deleting,Creating):
             event.ignore()
 
 # постеры или описание
-# разделить программу на классы
+# разделить программу на файлы
 
 # сделать переключение между таблицами разных категорий
 # доделать поле для выхода
