@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDialog, QHBoxLayout, QLabel, QVBoxLayout)
 import datetime
@@ -20,7 +22,7 @@ class Adding(UI):
                 vbox = QVBoxLayout()
                 label_dialog = QLabel()
                 self.reply.setWindowTitle("I.L.M.")
-                self.reply.setWindowIcon(QIcon('C:\\Users\\User\\Desktop\\pythonProject\\textures\\ILF.ico'))
+                self.reply.setWindowIcon(QIcon(os.path.abspath("..\\textures\\ILF.ico")))
                 palette = QPalette()
                 palette.setColor(QPalette.Button, Qt.yellow)
 
@@ -58,7 +60,7 @@ class Adding(UI):
         try:
             # Connecting to db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=C:\Users\User\Desktop\pythonProject\data\ILF.accdb;'
+                         r'DBQ=..\data\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cursor = conn.cursor()
             # Adding data in db

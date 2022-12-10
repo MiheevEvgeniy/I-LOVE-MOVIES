@@ -1,3 +1,5 @@
+import os
+
 from creating import *
 import tkinter
 from PyQt5.QtWidgets import (QLineEdit, QProgressBar,
@@ -12,14 +14,13 @@ class UI(object):
         self.cr = Creating()
         root = tkinter.Tk()
 
-
         self.WIDTH = root.winfo_screenwidth() - 240
         self.HEIGHT = root.winfo_screenheight() - 200
         self.center_w = root.winfo_reqwidth()
         self.center_h = root.winfo_reqheight()
         MW.setGeometry(self.center_w - 100, self.center_h - 100, self.WIDTH, self.HEIGHT)
-        MW.setWindowTitle("I.L.M. - I LOVE MOVIES v0.3")
-        MW.setWindowIcon(QIcon('C:\\Users\\User\\Desktop\\pythonProject\\textures\\ILF.ico'))
+        MW.setWindowTitle("I.L.M. - I LOVE MOVIES v0.4")
+        MW.setWindowIcon(QIcon(os.path.abspath("..\\textures\\ILF.ico")))
         MW.setFixedSize(self.WIDTH, self.HEIGHT)
 
         # Main lines (Name, Mark, Status, Category)
@@ -114,7 +115,6 @@ class UI(object):
         self.btn1 = QPushButton(MW)
         self.cr.create_button(self.btn1, 40, 175, 160, 30, 16)
 
-
         # Check boxes
         self.type_adding_btn = QCheckBox(MW)
         self.cr.create_textline(self.type_adding_btn, 40, 205, 200, 30, 12)
@@ -139,7 +139,7 @@ class UI(object):
         self.pbar.setStyleSheet(pbar_style)
         MW.setStyleSheet("""
                             QMainWindow {
-                                background-image: url(C:/Users/User/Desktop/pythonProject/textures/background.jpg);  
+                                background-image: url("../textures/background.jpg");  
                             }
                         """)
         # Terminal for searching results

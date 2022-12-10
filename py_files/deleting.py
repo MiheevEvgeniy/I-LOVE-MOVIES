@@ -10,7 +10,7 @@ class Deleting(UI):
         try:
             # Loading db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=C:\Users\User\Desktop\pythonProject\data\ILF.accdb;'
+                         r'DBQ=..\data\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cursor = conn.cursor()
             # Taking count of rows and deleting data from text line

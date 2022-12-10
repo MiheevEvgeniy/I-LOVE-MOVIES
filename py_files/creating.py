@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtWidgets import QTableWidgetItem
 import pyodbc
 
@@ -8,8 +10,8 @@ class Creating:
     def create_table(self,table):
         try:
             # Connecting to db
-            con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=C:\Users\User\Desktop\pythonProject\data\ILF.accdb;'
+            con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'\
+                         r'DBQ=..\data\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cur = conn.cursor()
             # Selecting Name column from db
@@ -68,7 +70,7 @@ class Creating:
                     row += 1
             conn.commit()
         except Exception as ex:
-            print("не дела...")
+            print("не дела в создании таблицы...")
             print(ex)
         table.show()
     def create_textline(self,name,x,y,size1,size2,font_size):

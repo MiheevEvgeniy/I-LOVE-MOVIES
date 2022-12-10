@@ -32,11 +32,15 @@ class Options(UI):
             self.Current_lan = "English"
             self.font_setting = "Change font size"
             self.num_x_font = 20
-            self.num_x2_font = 70
+            self.num_x2_font = 65
 
             self.red="Red"
             self.green = "Green"
             self.blue = "Blue"
+            self.ed_col_pl="Save current color"
+            self.clr_text = "Change color"
+            self.color_setting = "Set element color"
+            self.clr_x = 150
 
             self.txt3.clear()
             self.txt3.addItem("Finished")
@@ -87,12 +91,16 @@ class Options(UI):
             self.num_x_lan = 30
             self.Current_lan = "Русский"
             self.font_setting = "Изменить размер\n   шрифта"
-            self.num_x_font = 15
-            self.num_x2_font = 75
+            self.num_x_font = 12
+            self.num_x2_font = 62
 
             self.red = "Красный"
             self.green = "Зеленый"
             self.blue = "Синий"
+            self.ed_col_pl = "Сохранить текущий цвет"
+            self.clr_text = "Сменить цвет"
+            self.color_setting = "Установить цвет\n    элемента"
+            self.clr_x = 180
 
             self.txt1.setPlaceholderText("Название")
 
@@ -143,7 +151,7 @@ class Options(UI):
         try:
             # Connection to db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=C:\Users\User\Desktop\pythonProject\data\ILF.accdb;'
+                         r'DBQ=..\data\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cur = conn.cursor()
             # Selecting data from db

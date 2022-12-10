@@ -1,5 +1,6 @@
+import os
 import sys, configparser
-from PyQt5.QtWidgets import (QMainWindow, QApplication,QMessageBox, qApp)
+from PyQt5.QtWidgets import (QMainWindow, QApplication, QMessageBox, qApp)
 from options import *
 from system import *
 from saving import *
@@ -7,7 +8,8 @@ from loading import *
 from adding import *
 from deleting import *
 
-class App(QMainWindow,Options,Systems,Saving,Loading,Adding,Deleting,Creating):
+
+class App(QMainWindow, Options, Systems, Saving, Loading, Adding, Deleting, Creating):
     def __init__(self):
         super().__init__()
         self.init_UI(self)
@@ -33,7 +35,9 @@ class App(QMainWindow,Options,Systems,Saving,Loading,Adding,Deleting,Creating):
         self.srch_b.clicked.connect(lambda: self.search())
 
         self.config = configparser.ConfigParser()
-        self.config.read('C:\\Users\\User\\Desktop\\pythonProject\\data\\config.ini')
+        self.color_conf = configparser.ConfigParser()
+        self.config.read(os.path.abspath("..\data\config.ini"))
+        self.color_conf.read(os.path.abspath("..\data\color_data.ini"))
         self.load_settings()
 
         if self.config["application"]["language"] == 'rus':
@@ -43,12 +47,13 @@ class App(QMainWindow,Options,Systems,Saving,Loading,Adding,Deleting,Creating):
         if self.config["application"]["language"] == 'eng':
             self.Current_lan = "English"
             self.change_language(self.Current_lan)
-    def closeEvent(self,event):
+
+    def closeEvent(self, event):
         # Program Closing window
         close = QMessageBox.question(self,
-                                               self.exit_word,
-                                               self.exit_sentence,
-                                               QMessageBox.Yes | QMessageBox.Cancel)
+                                     self.exit_word,
+                                     self.exit_sentence,
+                                     QMessageBox.Yes | QMessageBox.Cancel)
 
         if close == QMessageBox.Yes:
             self.save_settings()
@@ -56,6 +61,7 @@ class App(QMainWindow,Options,Systems,Saving,Loading,Adding,Deleting,Creating):
             event.accept()
         if close == QMessageBox.Cancel:
             event.ignore()
+
 
 # постеры или описание
 # разделить программу на файлы
@@ -80,17 +86,14 @@ class App(QMainWindow,Options,Systems,Saving,Loading,Adding,Deleting,Creating):
 8) Темная тема (вкл/выкл)
 """
 
-
 # сделать apk и попробовать удалить бд
 # ЗАДЕЛ НА БУДУЩЕЕ!! КОРОЧ, СОЗДАТЬ ОТДЕЛЬНОЕ ОКНО С НАСТРОЙКАМИ
 # ВНЕШНЕГО ВИДА!!!!!!! ЦВЕТА, КАРТИНКИ ФОНА И Т.Д. ООААООАОАОАОАОАО
 # КОРОЧ, ЕЩЕ ОДНА КРУТАЯ ИДЕЯ!!!!!!! МОЖНО СОЗДАВАТЬ СТИИИИИИЛЛИИИИ!!! ОАОАОАОАОАОАОА
 
 if __name__ == '__main__':
-
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     APPLICATION = App()
     APPLICATION.show()
     sys.exit(app.exec_())
-

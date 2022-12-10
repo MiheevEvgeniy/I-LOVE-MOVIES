@@ -1,3 +1,5 @@
+from PyQt5.QtGui import QPalette, QColor
+
 from ui import *
 import pyodbc
 
@@ -5,6 +7,9 @@ import pyodbc
 class Saving(UI):
     def __init__(self):
         super(Saving, self).__init__()
+        self.hex_txt = None
+        self.color_conf = None
+        self.color_plates = None
         self.filter_category = None
         self.filter_status = None
         self.filter_time = None
@@ -12,11 +17,34 @@ class Saving(UI):
         self.filter_name = None
         self.config = None
         self.groupbox3 = None
+
+    def save_color(self,red, green, blue):
+        try:
+            red, green, blue = int(red), int(green), int(blue)
+            pal = QPalette()
+            pal.setColor(QPalette.Button, QColor(red, green, blue))
+            if int(self.color_conf["user_colors"]["plates_filled"])==20:
+                self.color_conf.set("user_colors",
+                                    "plates_filled",
+                                    "0")
+            self.color_plates[int(self.color_conf["user_colors"]["plates_filled"])].setPalette(pal)
+            self.color_conf.set("user_colors",
+                                ("col" + str(int(self.color_conf["user_colors"]["plates_filled"]) + 1)),
+                                self.hex_txt.text())
+
+            self.color_conf.set("user_colors",
+                                    "plates_filled",
+                                    str(int(self.color_conf["user_colors"]["plates_filled"]) + 1))
+            with open(os.path.abspath("..\\data\\color_data.ini"), 'w') \
+                    as configfile:  # save
+                self.color_conf.write(configfile)
+        except Exception:
+            pass
     def save_func(self):
         try:
             # Connecting to db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=C:\Users\User\Desktop\pythonProject\data\ILF.accdb;'
+                         r'DBQ=..\data\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cursor = conn.cursor()
             for row in range(0, self.table.rowCount()):
@@ -83,6 +111,5 @@ class Saving(UI):
             self.config.set("application", "check_add_func", "0")
         else:
             self.config.set("application", "check_add_func", "1")
-        with open('C:\\Users\\User\\Desktop\\pythonProject\\data\\config.ini', 'w') \
-                as configfile:  # save
+        with open(os.path.abspath("..\\data\\config.ini"), 'w') as configfile:  # save
             self.config.write(configfile)
