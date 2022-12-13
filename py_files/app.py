@@ -14,7 +14,7 @@ class App(QMainWindow, Options, Systems, Saving, Loading, Adding, Deleting, Crea
         super().__init__()
         self.init_UI(self)
         self.btn1.clicked.connect(lambda: self.add_func())
-
+        self.txt1.editingFinished.connect(lambda : self.add_func())
         self.range_group()
         self.ran_b1.clicked.connect(lambda: self.range(self.ran_t1.text(), self.ran_t2.text()))
 
@@ -53,37 +53,29 @@ class App(QMainWindow, Options, Systems, Saving, Loading, Adding, Deleting, Crea
         close = QMessageBox.question(self,
                                      self.exit_word,
                                      self.exit_sentence,
-                                     QMessageBox.Yes | QMessageBox.Cancel)
+                                     QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
 
         if close == QMessageBox.Yes:
             self.save_settings()
             self.save_func()
+            event.accept()
+        if close == QMessageBox.No:
             event.accept()
         if close == QMessageBox.Cancel:
             event.ignore()
 
 
 # постеры или описание
-# разделить программу на файлы
 
 # сделать переключение между таблицами разных категорий
-# доделать поле для выхода
 # установить фон для терминала системы поиска
 
 # в настройках знак вопроса (иконка) - дать функционал
-# сделать смену языка ******
 # в русской версии сделать окно выхода тоже на русском (выбор - да, отмена)
 
 # окно для настроек(глобальных) и разбить на группы(основное, вид и т.д.):
 """
-1) включение/выключение очистки полей в месте удаления данных
-2) выбор языка -------------
-3) отключение предупреждения при выходе
-4) установка цвета закрузочной полосы
-5) смена стилей приложения
-6) изменение размера шрифта в разных областях программы (или на все)------------
 7) перевести информацию из таблицы в отдельный файл (txt, excel)
-8) Темная тема (вкл/выкл)
 """
 
 # сделать apk и попробовать удалить бд

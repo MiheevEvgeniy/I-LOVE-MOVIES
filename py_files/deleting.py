@@ -4,6 +4,9 @@ from ui import *
 
 class Deleting(UI):
     def __init__(self):
+        self.ran_t2 = None
+        self.ran_t1 = None
+        self.clearDeleteMark = None
         self.list_nums = None
     def delete(self,txtval):
         # This function deleting data from db

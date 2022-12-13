@@ -1,13 +1,13 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QDialog, QLabel, QVBoxLayout, QAction, QSlider)
+from PyQt5.QtWidgets import (QDialog, QLabel, QVBoxLayout, QAction, QSlider, QFileDialog, QMessageBox)
 from PyQt5.QtGui import QPalette, QColor
 from ui import *
+import adding
 
 
 class Systems(UI):
     def __init__(self):
         super(Systems, self).__init__()
-        self.clr_x = None
         self.color_setting = None
         self.clr_text = None
         self.color_conf = None
@@ -15,12 +15,15 @@ class Systems(UI):
         self.blue = None
         self.green = None
         self.red = None
-        self.font_setting = None
         self.num_x2_font = None
         self.num_x_font = None
         self.Current_lan = None
         self.lan_setting = None
         self.num_x_lan = None
+        self.txtCreate = None
+        self.xlsCreate = None
+        self.txtLoadText = None
+        self.xlsLoadText = None
 
     def searching_sys(self):
         # Search line
@@ -104,6 +107,7 @@ class Systems(UI):
         self.settings_action.setShortcut('Ctrl+E')
         self.settings_action.setStatusTip('Program settings')
 
+
         # Menu bar and adding actions on it
         self.menubar = self.menuBar()
         self.file_menu = self.menubar.addMenu('&File')
@@ -117,45 +121,137 @@ class Systems(UI):
     def settings_menu(self):
         # Settings window for menu bar
         self.st_menu = QDialog()
-        self.st_menu.setFixedSize(800, 400)
+        self.st_menu.setFixedSize(550, 300)
         self.st_menu.setWindowTitle("Settings")
         self.st_menu.setWindowIcon(QIcon('..\\textures\\settings.svg'))
         self.st_menu.setWindowModality(Qt.ApplicationModal)
 
-        self.lbl = QLabel(self.st_menu)
+        self.colorAndLaguage = QGroupBox(self.st_menu)
+        self.colorAndLaguage.move(20, 20)
+        self.colorAndLaguage.autoFillBackground()
+
+        self.lbl = QLabel(self.colorAndLaguage)
         self.cr.create_textline(self.lbl, self.num_x_lan, 30, 200, 30, 16)
         self.lbl.setText(self.lan_setting)
 
-        self.lan = QComboBox(self.st_menu)
+        self.lan = QComboBox(self.colorAndLaguage)
         self.cr.create_textline(self.lan, 150, 30, 100, 30, 16)
         self.lan.addItem("Русский")
         self.lan.addItem("English")
         self.lan.setCurrentText(self.Current_lan)
 
-        self.lbl1 = QLabel(self.st_menu)
-        self.cr.create_textline(self.lbl1, self.num_x_font, self.num_x2_font, 200, 45, 16)
-        self.lbl1.setText(self.font_setting)
-
-        self.new_font = QLineEdit(self.st_menu)
-        self.cr.create_textline(self.new_font, 150, 75, 40, 30, 16)
-
-        self.color_lbl  = QLabel(self.st_menu)
-        self.cr.create_textline(self.color_lbl, 20, 125, 200, 30, 16)
+        self.color_lbl  = QLabel(self.colorAndLaguage)
+        self.cr.create_textline(self.color_lbl, 30, 80, 200, 40, 16)
         self.color_lbl.setText(self.color_setting)
 
-        self.color_btn = QPushButton(self.st_menu)
-        self.cr.create_button(self.color_btn, self.clr_x, 120, 110, 30, 16)
+        self.elements = QComboBox(self.colorAndLaguage)
+        self.cr.create_textline(self.elements, 40, 125, 150, 30, 16)
+        self.elements.addItem("Table borders")
+        self.elements.addItem("Table cells")
+        self.elements.addItem("Table head")
+        self.elements.addItem("Font")
+        self.elements.addItem("Menu bar")
+        self.elements.addItem("Progress bar")
+
+        self.color_btn = QPushButton(self.colorAndLaguage)
+        self.cr.create_button(self.color_btn, 40, 170, 110, 30, 16)
         self.color_btn.setText(self.clr_text)
         self.color_btn.clicked.connect((lambda: pick_color_menu()))
 
-        self.elements = QComboBox(self.st_menu)
-        self.cr.create_textline(self.elements, self.clr_x+150, 120, 150, 30, 16)
-        self.elements.addItem("Table borders")
-        self.elements.addItem("Table cells")
-        self.elements.addItem("Font")
-        self.elements.addItem("Poles")
-        self.elements.addItem("Menu bar")
+        self.loadAndUploads = QGroupBox(self.st_menu)
+        self.loadAndUploads.move(310, 20)
+        self.loadAndUploads.autoFillBackground()
 
+        # Load to txt
+        self.txtUpload = QPushButton(self.loadAndUploads)
+        self.cr.create_button(self.txtUpload, 30, 30, 130, 30, 16)
+        self.txtUpload.setText(self.txtCreate)
+        self.txtUpload.clicked.connect((lambda: loadTxt()))
+
+        # Load to xls
+        self.xlsUpload = QPushButton(self.loadAndUploads)
+        self.cr.create_button(self.xlsUpload, 30, 80, 140, 30, 16)
+        self.xlsUpload.setText(self.xlsCreate)
+        self.xlsUpload.clicked.connect((lambda: None))
+
+        # Load from txt
+        self.txtLoad = QPushButton(self.loadAndUploads)
+        self.cr.create_button(self.txtLoad, 30, 130, 130, 30, 16)
+        self.txtLoad.setText(self.txtLoadText)
+        self.txtLoad.clicked.connect((lambda:  readTxt("Фильм/Сериал")))
+
+        # Load from xls
+        self.xlsLoad = QPushButton(self.loadAndUploads)
+        self.cr.create_button(self.xlsLoad, 30, 180, 140, 30, 16)
+        self.xlsLoad.setText(self.xlsLoadText)
+        self.xlsLoad.clicked.connect((lambda: None))
+
+        def loadTxt():
+            try:
+                dir_ = QFileDialog.getExistingDirectory(None, 'Select a folder:', 'C:\\',
+                                                              QFileDialog.ShowDirsOnly)
+                print(dir_)
+                file = open(dir_+'/My ILM list.txt','w')
+                maxLineLen = 70
+                for row in range(0, self.table.rowCount()):
+                    # Taking data from rows in table
+                    Name = (self.table.item(row, 0).text())
+                    Mark = (self.table.item(row, 1).text())
+                    Status = (self.table.item(row, 2).text())
+                    line = Name + " (" + Status + " " + Mark + "/10)\n"
+                    lineLen = len(line)
+
+                    if lineLen != maxLineLen:
+                        line = Name + ("-"*(maxLineLen-lineLen))+ " (" + Status + " " + Mark + "/10)\n"
+                    file.write(line)
+                QMessageBox.about(self.st_menu, "Результат выгрузки", "Данные выгружены")
+                file.close()
+            except Exception as ex:
+                QMessageBox.about(self.st_menu, "Результат выгрузки", "Ошибка выгрузки")
+                print(ex)
+        def readTxt(type):
+            try:
+                dir_ = QFileDialog.getOpenFileName(None, 'Select a folder:', 'C:\\')
+                if (dir_[0][-4:]) == ".txt":
+                    with open(dir_[0], 'r', encoding="utf-8") as f:
+
+                        for file in f:
+                            isName = True
+                            isStatus = False
+                            isMark = False
+                            Name = ""
+                            Status = ""
+                            Mark = ""
+                            Category = type
+
+                            for i in file:
+                                if i == "(" and isName:
+                                    isName = False
+                                    isStatus = True
+                                    continue
+                                if not (isName) and isStatus and i == " ":
+                                    isStatus = False
+                                    isMark = True
+                                    continue
+                                if not (isStatus) and isMark and i == "\\":
+                                    break
+
+                                if isName:
+                                    Name+=i
+                                elif isStatus:
+                                    Status+=i
+                                elif isMark:
+                                    Mark+=i
+
+                            adding.Adding.add_without_check(adding.Adding(), Name, Mark, Status, Category, self.table, self.txt1)
+
+                    f.close()
+
+                else:
+                    print("not txt")
+                print(dir_[0])
+            except Exception as ex:
+                print(ex)
         def pick_color_menu():
             # Info window for menu bar
             self.pcm = QDialog()
@@ -286,7 +382,42 @@ class Systems(UI):
 
             self.load_colors()
 
+            self.chooseColor = QPushButton(self.pcm)
+            self.cr.create_button(self.chooseColor, 10, 150, 300, 30, 16)
+            self.chooseColor.setText("Finish")
+            self.chooseColor.clicked.connect(lambda: finishChoosingColor(self.elements.currentText(), self.hex_txt.text()))
+
+
             self.pcm.show()
+            def finishChoosingColor(element, color):
+
+                if element == "Menu bar":
+                    newColor = "QMenuBar{background-color: " + color + ";}"
+                    self.menubar.setStyleSheet(newColor)
+                if element == "Table borders":
+                    self.borderStyle = "QTableWidget::item {border: 1px outset "+color+";}"
+                    self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
+                if  element == "Table cells":
+                    self.cellsStyle = "QTableWidget{background-color: " + color + ";}"
+                    self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
+                if element == "Table head":
+                    self.headStyle = "QHeaderView::section{background-color: "+ color +";}"
+                    self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
+                if element == "Progress bar":
+                    newColor = """
+                        QProgressBar {
+                                border: 2px solid gray;
+                                border-radius: 5px;
+                                text-align: center;
+                                font-size: 10px;
+                        }
+                        QProgressBar::chunk {
+                                background-color: """+color+""";
+                                width: 10px;
+                                margin: 0.5px;
+                        }
+                    """
+                    self.pbar.setStyleSheet(newColor)
 
             def text_color_edited(red, green, blue):
                 if str(red).isdigit() == False:
@@ -351,11 +482,12 @@ class Systems(UI):
             self.change_language(self.lan.currentText())
             self.cr.create_textline(self.lbl, self.num_x_lan, 30, 200, 30, 16)
             self.lbl.setText(self.lan_setting)
-            self.lbl1.setText(self.font_setting)
-            self.cr.create_textline(self.lbl1, self.num_x_font, self.num_x2_font, 200, 45, 16)
+            self.xlsUpload.setText(self.xlsCreate)
+            self.txtUpload.setText(self.txtCreate)
+            self.txtLoad.setText(self.txtLoadText)
+            self.xlsLoad.setText(self.xlsLoadText)
             self.color_lbl.setText(self.color_setting)
             self.color_btn.setText(self.clr_text)
-            self.cr.create_textline(self.color_btn, self.clr_x, 120, 100, 30, 16)
 
         self.lan.currentTextChanged.connect(lambda: chan_lag())
 

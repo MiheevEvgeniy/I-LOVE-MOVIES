@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QLineEdit, QProgressBar,
                              QPushButton, QTableWidget, QComboBox,
                              QListWidget, QGroupBox, QCheckBox)
 from PyQt5.QtGui import QIcon
-
+from PyQt5.QtCore import Qt
 
 class UI(object):
     def init_UI(self, MW):
@@ -14,11 +14,11 @@ class UI(object):
         self.cr = Creating()
         root = tkinter.Tk()
 
-        self.WIDTH = root.winfo_screenwidth() - 240
-        self.HEIGHT = root.winfo_screenheight() - 200
-        self.center_w = root.winfo_reqwidth()
-        self.center_h = root.winfo_reqheight()
-        MW.setGeometry(self.center_w - 100, self.center_h - 100, self.WIDTH, self.HEIGHT)
+        self.WIDTH = 1120
+        self.HEIGHT =600
+        self.center_w = root.winfo_reqwidth()*1.5
+        self.center_h = root.winfo_reqheight()*1.5
+        MW.setGeometry(self.center_w, self.center_h, self.WIDTH, self.HEIGHT)
         MW.setWindowTitle("I.L.M. - I LOVE MOVIES v0.4")
         MW.setWindowIcon(QIcon(os.path.abspath("..\\textures\\ILF.ico")))
         MW.setFixedSize(self.WIDTH, self.HEIGHT)
@@ -27,6 +27,7 @@ class UI(object):
         # Name
         self.txt1 = QLineEdit(self)
         self.cr.create_textline(self.txt1, 20, 30, 200, 30, 16)
+
         # Mark
         self.txt2 = QComboBox(MW)
         for num in range(100, 6, -5):
@@ -92,7 +93,7 @@ class UI(object):
         # Table
         self.table = QTableWidget(self)
         self.table.setColumnCount(5)
-        self.table.setRowCount(5)
+        self.table.setRowCount(0)
         self.table.move(20, 240)
 
         L = (self.WIDTH - 35)
@@ -110,6 +111,11 @@ class UI(object):
 
         self.table.setMinimumWidth(L)
         self.table.setMinimumHeight(self.HEIGHT - 250)
+
+        self.borderStyle = "QTableWidget::item {border: 1px outset gray;}"
+        self.cellsStyle = "QTableWidget{background-color: white;}"
+        self.headStyle = "QHeaderView::section{background-color: white}"
+        self.table.setStyleSheet(self.borderStyle + self.cellsStyle+ self.headStyle)
 
         # Button
         self.btn1 = QPushButton(MW)
