@@ -1,4 +1,3 @@
-import os
 
 from creating import *
 import tkinter
@@ -6,7 +5,6 @@ from PyQt5.QtWidgets import (QLineEdit, QProgressBar,
                              QPushButton, QTableWidget, QComboBox,
                              QListWidget, QGroupBox, QCheckBox)
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
 
 class UI(object):
     def init_UI(self, MW):

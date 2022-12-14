@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (QDialog, QLabel, QVBoxLayout, QAction, QSlider, QFi
 from PyQt5.QtGui import QPalette, QColor
 from ui import *
 import adding
+import pandas as pd
 
 
 class Systems(UI):
@@ -24,6 +25,17 @@ class Systems(UI):
         self.xlsCreate = None
         self.txtLoadText = None
         self.xlsLoadText = None
+        self.films=None
+        self.books = None
+        self.games = None
+        self.finish = None
+        self.reset = None
+        self.table_borders_text = None
+        self.table_cells_text = None
+        self.table_head = None
+        self.menubar_text = None
+        self.progress_bar = None
+        self.hex_txt = None
 
     def searching_sys(self):
         # Search line
@@ -121,7 +133,7 @@ class Systems(UI):
     def settings_menu(self):
         # Settings window for menu bar
         self.st_menu = QDialog()
-        self.st_menu.setFixedSize(550, 300)
+        self.st_menu.setFixedSize(540, 300)
         self.st_menu.setWindowTitle("Settings")
         self.st_menu.setWindowIcon(QIcon('..\\textures\\settings.svg'))
         self.st_menu.setWindowModality(Qt.ApplicationModal)
@@ -140,23 +152,64 @@ class Systems(UI):
         self.lan.addItem("English")
         self.lan.setCurrentText(self.Current_lan)
 
+        def finishChoosingColor(element, color):
+
+            if element == self.menubar_text:
+                newColor = "QMenuBar{background-color: " + color + ";}"
+                self.menubar.setStyleSheet(newColor)
+            if element == self.table_borders_text:
+                self.borderStyle = "QTableWidget::item {border: 1px outset " + color + ";}"
+                self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
+            if element == self.table_cells_text:
+                self.cellsStyle = "QTableWidget{background-color: " + color + ";}"
+                self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
+            if element == self.table_head:
+                self.headStyle = "QHeaderView::section{background-color: " + color + ";}"
+                self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
+            if element == self.progress_bar:
+                newColor = """
+                    QProgressBar {
+                            border: 2px solid gray;
+                            border-radius: 5px;
+                            text-align: center;
+                            font-size: 10px;
+                    }
+                    QProgressBar::chunk {
+                            background-color: """ + color + """;
+                            width: 10px;
+                            margin: 0.5px;
+                    }
+                """
+                self.pbar.setStyleSheet(newColor)
+
         self.color_lbl  = QLabel(self.colorAndLaguage)
         self.cr.create_textline(self.color_lbl, 30, 80, 200, 40, 16)
         self.color_lbl.setText(self.color_setting)
 
         self.elements = QComboBox(self.colorAndLaguage)
-        self.cr.create_textline(self.elements, 40, 125, 150, 30, 16)
-        self.elements.addItem("Table borders")
-        self.elements.addItem("Table cells")
-        self.elements.addItem("Table head")
-        self.elements.addItem("Font")
-        self.elements.addItem("Menu bar")
-        self.elements.addItem("Progress bar")
+        self.cr.create_textline(self.elements, 40, 125, 170, 30, 16)
+        self.elements.addItem(self.table_borders_text)
+        self.elements.addItem(self.table_cells_text)
+        self.elements.addItem(self.table_head)
+        self.elements.addItem(self.menubar_text)
+        self.elements.addItem(self.progress_bar)
 
         self.color_btn = QPushButton(self.colorAndLaguage)
         self.cr.create_button(self.color_btn, 40, 170, 110, 30, 16)
         self.color_btn.setText(self.clr_text)
         self.color_btn.clicked.connect((lambda: pick_color_menu()))
+
+        self.resetTheme = QPushButton(self.colorAndLaguage)
+        self.cr.create_button(self.resetTheme, 40, 210, 160, 30, 16)
+        self.resetTheme.setText(self.reset)
+        self.resetTheme.clicked.connect(lambda: setResetTheme())
+
+        def setResetTheme():
+            finishChoosingColor(self.table_borders_text, "gray")
+            finishChoosingColor(self.table_cells_text, "white")
+            finishChoosingColor(self.table_head, "white")
+            finishChoosingColor(self.menubar_text, "white")
+            finishChoosingColor(self.progress_bar, "white")
 
         self.loadAndUploads = QGroupBox(self.st_menu)
         self.loadAndUploads.move(310, 20)
@@ -166,31 +219,70 @@ class Systems(UI):
         self.txtUpload = QPushButton(self.loadAndUploads)
         self.cr.create_button(self.txtUpload, 30, 30, 130, 30, 16)
         self.txtUpload.setText(self.txtCreate)
-        self.txtUpload.clicked.connect((lambda: loadTxt()))
+        self.txtUpload.clicked.connect((lambda: uploadTxt()))
 
         # Load to xls
         self.xlsUpload = QPushButton(self.loadAndUploads)
         self.cr.create_button(self.xlsUpload, 30, 80, 140, 30, 16)
         self.xlsUpload.setText(self.xlsCreate)
-        self.xlsUpload.clicked.connect((lambda: None))
+        self.xlsUpload.clicked.connect((lambda: uploadXls()))
 
         # Load from txt
         self.txtLoad = QPushButton(self.loadAndUploads)
         self.cr.create_button(self.txtLoad, 30, 130, 130, 30, 16)
         self.txtLoad.setText(self.txtLoadText)
-        self.txtLoad.clicked.connect((lambda:  readTxt("Фильм/Сериал")))
+        self.txtLoad.clicked.connect((lambda:  readTxt()))
 
         # Load from xls
         self.xlsLoad = QPushButton(self.loadAndUploads)
         self.cr.create_button(self.xlsLoad, 30, 180, 140, 30, 16)
         self.xlsLoad.setText(self.xlsLoadText)
-        self.xlsLoad.clicked.connect((lambda: None))
+        self.xlsLoad.clicked.connect((lambda: readXls()))
 
-        def loadTxt():
+        def readXls():
+            try:
+                dir_ = QFileDialog.getOpenFileName(None, 'Select a file:', 'C:\\')
+                if (dir_[0][-4:]) == ".xls" or (dir_[0][-4:]) == ".xlsx":
+                    data = pd.read_excel(dir_[0], engine="openpyxl")
+                    for i in range(0,data[self.filter_name.text()].size):
+                        Name = data[self.filter_name.text()][i]
+                        Status = data[self.filter_status.text()][i]
+                        Mark = data[self.filter_mark.text()][i]
+                        Category = data[self.filter_category.text()][i]
+                        adding.Adding.add_without_check(adding.Adding(), Name, Mark, Status, Category, self.table, self.txt1)
+                QMessageBox.about(self.st_menu, "Результат загрузки", "Данные загружены")
+            except Exception as ex:
+                QMessageBox.about(self.st_menu, "Результат загрузки", "Ошибка загрузки")
+                print(ex)
+        def uploadXls():
             try:
                 dir_ = QFileDialog.getExistingDirectory(None, 'Select a folder:', 'C:\\',
                                                               QFileDialog.ShowDirsOnly)
-                print(dir_)
+                path = dir_+'/My ILM list.xls'
+                Name = []
+                Mark = []
+                Status = []
+                Category = []
+                for row in range(0, self.table.rowCount()):
+                    # Taking data from rows in table
+                    Name.append((self.table.item(row, 0).text()))
+                    Mark.append((self.table.item(row, 1).text()))
+                    Status.append(self.table.item(row, 2).text())
+                    Category.append(self.table.item(row, 3).text())
+                data = pd.DataFrame(data = {self.filter_category.text(): Category,
+                                     self.filter_name.text(): Name,
+                                     self.filter_mark.text(): Mark,
+                                     self.filter_status.text(): Status})
+                data.to_excel(path, engine='xlsxwriter')
+                QMessageBox.about(self.st_menu, "Результат выгрузки", "Данные выгружены")
+            except Exception as ex:
+                QMessageBox.about(self.st_menu, "Результат выгрузки", "Ошибка выгрузки")
+                print(ex)
+
+        def uploadTxt():
+            try:
+                dir_ = QFileDialog.getExistingDirectory(None, 'Select a folder:', 'C:\\',
+                                                              QFileDialog.ShowDirsOnly)
                 file = open(dir_+'/My ILM list.txt','w')
                 maxLineLen = 70
                 for row in range(0, self.table.rowCount()):
@@ -198,33 +290,38 @@ class Systems(UI):
                     Name = (self.table.item(row, 0).text())
                     Mark = (self.table.item(row, 1).text())
                     Status = (self.table.item(row, 2).text())
-                    line = Name + " (" + Status + " " + Mark + "/10)\n"
+                    Category = (self.table.item(row, 3).text())
+                    line = Category + ": " + Name + " (" + Status + " " + Mark + "/10)\n"
                     lineLen = len(line)
-
                     if lineLen != maxLineLen:
-                        line = Name + ("-"*(maxLineLen-lineLen))+ " (" + Status + " " + Mark + "/10)\n"
+                        line =  Category+ ": " +Name + ("-"*(maxLineLen-lineLen))+ " (" + Status + " " + Mark + "/10)\n"
                     file.write(line)
                 QMessageBox.about(self.st_menu, "Результат выгрузки", "Данные выгружены")
                 file.close()
             except Exception as ex:
                 QMessageBox.about(self.st_menu, "Результат выгрузки", "Ошибка выгрузки")
                 print(ex)
-        def readTxt(type):
+        def readTxt():
             try:
-                dir_ = QFileDialog.getOpenFileName(None, 'Select a folder:', 'C:\\')
+                dir_ = QFileDialog.getOpenFileName(None, 'Select a file:', 'C:\\')
                 if (dir_[0][-4:]) == ".txt":
                     with open(dir_[0], 'r', encoding="utf-8") as f:
 
                         for file in f:
-                            isName = True
+                            isCategory = True
+                            isName = False
                             isStatus = False
                             isMark = False
                             Name = ""
                             Status = ""
                             Mark = ""
-                            Category = type
+                            Category = ""
 
                             for i in file:
+                                if i == ":" and isCategory:
+                                    isCategory = False
+                                    isName = True
+                                    continue
                                 if i == "(" and isName:
                                     isName = False
                                     isStatus = True
@@ -233,10 +330,11 @@ class Systems(UI):
                                     isStatus = False
                                     isMark = True
                                     continue
-                                if not (isStatus) and isMark and i == "\\":
+                                if not (isStatus) and isMark and i == "/":
                                     break
-
-                                if isName:
+                                if isCategory:
+                                    Category+=i
+                                elif isName:
                                     Name+=i
                                 elif isStatus:
                                     Status+=i
@@ -244,13 +342,11 @@ class Systems(UI):
                                     Mark+=i
 
                             adding.Adding.add_without_check(adding.Adding(), Name, Mark, Status, Category, self.table, self.txt1)
-
+                    QMessageBox.about(self.st_menu, "Результат загрузки", "Данные загружены")
                     f.close()
 
-                else:
-                    print("not txt")
-                print(dir_[0])
             except Exception as ex:
+                QMessageBox.about(self.st_menu, "Результат загрузки", "Ошибка загрузки")
                 print(ex)
         def pick_color_menu():
             # Info window for menu bar
@@ -360,18 +456,46 @@ class Systems(UI):
             y = 10
             pal = QPalette()
             pal.setColor(QPalette.Button, QColor(255, 255, 255).toRgb())
-            for i in range(20):
-                color_plate = QPushButton(self.pcm)
-                self.cr.create_button(color_plate, x, y, 25, 25, 12)
 
-                color_plate.setPalette(pal)
-                self.color_plates.append(color_plate)
+            for i in range(20):
+                self.color_plates.append(QPushButton(self.pcm))
+                self.color_plates[i].setPalette(pal)
+                self.color_plates[i].clicked.connect(lambda state, index=i, obj = self.color_plates[i]: miniColorBtn(index))
+                self.cr.create_button(self.color_plates[i], x, y, 25, 25, 12)
+                print(i)
+                print(self.color_plates[i])
+                print("---------------")
+
                 if i == 9:
                     x = 10
                     y += 40
                 else:
                     x += 30
+            def miniColorBtn(index):
+                try:
+                    hex_color = (self.color_conf["user_colors"]["col" + str(index + 1)])[1:]
+                    hex_tuple = tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+                    red = hex_tuple[0]
+                    green = hex_tuple[1]
+                    blue = hex_tuple[2]
 
+                    color = QColor(red, green, blue)
+
+                    pallet = QPalette()
+                    pallet.setColor(QPalette.Base, QColor(color.toRgb()))
+                    self.color_menu.setPalette(pallet)
+
+                    self.red_txt.setText(str(red))
+                    self.green_txt.setText(str(green))
+                    self.blue_txt.setText(str(blue))
+
+                    self.slider_red.setValue(red)
+                    self.slider_green.setValue(green)
+                    self.slider_blue.setValue(blue)
+
+                    self.hex_txt.setText("#" + hex_color)
+                except Exception as e:
+                    print(e)
 
             self.save_color_plate = QPushButton(self.pcm)
             self.cr.create_button(self.save_color_plate, 10, 80, 300, 30, 16)
@@ -384,40 +508,14 @@ class Systems(UI):
 
             self.chooseColor = QPushButton(self.pcm)
             self.cr.create_button(self.chooseColor, 10, 150, 300, 30, 16)
-            self.chooseColor.setText("Finish")
+            self.chooseColor.setText(self.finish)
             self.chooseColor.clicked.connect(lambda: finishChoosingColor(self.elements.currentText(), self.hex_txt.text()))
 
 
-            self.pcm.show()
-            def finishChoosingColor(element, color):
 
-                if element == "Menu bar":
-                    newColor = "QMenuBar{background-color: " + color + ";}"
-                    self.menubar.setStyleSheet(newColor)
-                if element == "Table borders":
-                    self.borderStyle = "QTableWidget::item {border: 1px outset "+color+";}"
-                    self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
-                if  element == "Table cells":
-                    self.cellsStyle = "QTableWidget{background-color: " + color + ";}"
-                    self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
-                if element == "Table head":
-                    self.headStyle = "QHeaderView::section{background-color: "+ color +";}"
-                    self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
-                if element == "Progress bar":
-                    newColor = """
-                        QProgressBar {
-                                border: 2px solid gray;
-                                border-radius: 5px;
-                                text-align: center;
-                                font-size: 10px;
-                        }
-                        QProgressBar::chunk {
-                                background-color: """+color+""";
-                                width: 10px;
-                                margin: 0.5px;
-                        }
-                    """
-                    self.pbar.setStyleSheet(newColor)
+
+            self.pcm.show()
+
 
             def text_color_edited(red, green, blue):
                 if str(red).isdigit() == False:
@@ -488,6 +586,15 @@ class Systems(UI):
             self.xlsLoad.setText(self.xlsLoadText)
             self.color_lbl.setText(self.color_setting)
             self.color_btn.setText(self.clr_text)
+
+            self.elements.clear()
+            self.elements.addItem(self.table_borders_text)
+            self.elements.addItem(self.table_cells_text)
+            self.elements.addItem(self.table_head)
+            self.elements.addItem(self.menubar_text)
+            self.elements.addItem(self.progress_bar)
+
+            self.resetTheme.setText(self.reset)
 
         self.lan.currentTextChanged.connect(lambda: chan_lag())
 

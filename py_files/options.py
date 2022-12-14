@@ -12,10 +12,14 @@ class Options(UI):
         self.ran_l2 = None
         self.ran_t1 = None
         self.ran_l1 = None
+        self.finish = None
         self.list_b3 = None
         self.list_b2 = None
         self.list_l1 = None
         self.found_data_value = None
+        self.films = None
+        self.books = None
+        self.games = None
         self.found_data = None
         self.srch_t = None
         self.filter_time = None
@@ -36,6 +40,7 @@ class Options(UI):
             self.Current_lan = "English"
             self.num_x_font = 20
             self.num_x2_font = 65
+            self.finish = "Finish"
 
             self.txtCreate = "Upload to txt"
             self.xlsCreate = "Upload to excel"
@@ -53,10 +58,15 @@ class Options(UI):
             self.txt3.addItem("Finished")
             self.txt3.addItem("Not finished")
 
+            self.films = "Film"
+            self.series = "Series"
+            self.books = "Book"
+            self.games = "Game"
             self.txt4.clear()
-            self.txt4.addItem("Film/Series")
-            self.txt4.addItem("Book")
-            self.txt4.addItem("Game")
+            self.txt4.addItem(self.films)
+            self.txt4.addItem(self.series)
+            self.txt4.addItem(self.books)
+            self.txt4.addItem(self.games)
 
             self.groupbox.setTitle("Turn on range deleting")
             self.groupbox2.setTitle("Turn on list deleting")
@@ -74,20 +84,26 @@ class Options(UI):
 
             self.type_adding_btn.setText("Turn on checking pole")
 
-            self.srch_t.setPlaceholderText("Search")
+            self.srch_t.setPlaceholderText("Search by name")
+            self.reset = "Default theme"
+            self.table_borders_text = "Table borders"
 
             self.found_data.setText(f"Coincidences found: ")
             self.cr.create_textline(self.found_data_value, 420, 190, 250, 50, 20)
-
+            self.table_cells_text = "Table's background"
+            self.table_head = "Table head"
             self.list_l1.setText("Line")
             self.cr.create_textline(self.list_l1, 30, 15, 80, 40, 16)
             self.list_b2.setText("Clear")
             self.list_b3.setText("Start")
+            self.menubar_text = "Menu bar"
+            self.progress_bar = "Progress bar"
 
             self.ran_l1.setText("From")
             self.cr.create_textline(self.ran_t1, 50, 25, 50, 20, 14)
             self.ran_l2.setText("To")
             self.ran_b1.setText("Start\ndeleting")
+
 
             self.config.set("application", "language", "eng")
 
@@ -99,6 +115,14 @@ class Options(UI):
             self.Current_lan = "Русский"
             self.num_x_font = 12
             self.num_x2_font = 62
+            self.finish = "Завершить"
+            self.reset = "Тема по умолчанию"
+            self.progress_bar = "Шкала прогресса"
+            self.menubar_text = "Полоска конфигурации"
+
+            self.table_borders_text = "Границы таблицы"
+            self.table_head = "Заголовок таблицы"
+            self.table_cells_text = "Фон таблицы"
 
             self.txtCreate = "Выгрузить в txt"
             self.xlsCreate = "Выгрузить в excel"
@@ -118,10 +142,16 @@ class Options(UI):
             self.txt3.addItem("Завершено")
             self.txt3.addItem("Не завершено")
 
+            self.films = "Фильм"
+            self.series = "Сериал"
+            self.books = "Книга"
+            self.games = "Игра"
+
             self.txt4.clear()
-            self.txt4.addItem("Фильм/Сериал")
-            self.txt4.addItem("Книга")
-            self.txt4.addItem("Игра")
+            self.txt4.addItem(self.films)
+            self.txt4.addItem(self.series)
+            self.txt4.addItem(self.books)
+            self.txt4.addItem(self.games)
 
             self.groupbox.setTitle("Включить удаление диапазона")
             self.groupbox2.setTitle("Включить удаление по списку")
@@ -139,7 +169,7 @@ class Options(UI):
 
             self.type_adding_btn.setText("Включить проверку поля")
 
-            self.srch_t.setPlaceholderText("Поиск")
+            self.srch_t.setPlaceholderText("Поиск по названию")
 
             self.found_data.setText(f"Совпадений найдено: ")
             self.cr.create_textline(self.found_data_value, 440, 190, 250, 50, 20)
