@@ -21,12 +21,12 @@ class UI(object):
         MW.setWindowIcon(QIcon(os.path.abspath("..\\textures\\ILF.ico")))
         MW.setFixedSize(self.WIDTH, self.HEIGHT)
 
-        # Main lines (Name, Mark, Status, Category)
+        # Main lines (Name, Rate, Status, Category)
         # Name
         self.txt1 = QLineEdit(self)
         self.cr.create_textline(self.txt1, 20, 30, 200, 30, 16)
 
-        # Mark
+        # Rate
         self.txt2 = QComboBox(MW)
         for num in range(100, 6, -5):
             if num % 10 == 5:
@@ -96,13 +96,13 @@ class UI(object):
 
         L = (self.WIDTH - 35)
         LENGTH_Name = L * 0.45
-        LENGTH_Mark = L * 0.1
+        LENGTH_Rate = L * 0.1
         LENGTH_Status = L * 0.15
         LENGTH_Category = L * 0.15
         LENGTH_Date = L * 0.12
 
         self.table.setColumnWidth(0, int(LENGTH_Name))
-        self.table.setColumnWidth(1, int(LENGTH_Mark))
+        self.table.setColumnWidth(1, int(LENGTH_Rate))
         self.table.setColumnWidth(2, int(LENGTH_Status))
         self.table.setColumnWidth(3, int(LENGTH_Category))
         self.table.setColumnWidth(4, int(LENGTH_Date))

@@ -13,7 +13,7 @@ class Saving(UI):
         self.filter_category = None
         self.filter_status = None
         self.filter_time = None
-        self.filter_mark = None
+        self.filter_Rate = None
         self.filter_name = None
         self.config = None
         self.groupbox3 = None
@@ -66,13 +66,13 @@ class Saving(UI):
             for row in range(0, self.table.rowCount()):
                 # Taking data from rows in table
                 Name = (self.table.item(row, 0).text())
-                Mark = (self.table.item(row, 1).text())
+                Rate = (self.table.item(row, 1).text())
                 Status = (self.table.item(row, 2).text())
                 Category = (self.table.item(row, 3).text())
                 Time_pole = (self.table.item(row, 4).text())
                 # Saving it in db
                 cursor.execute('UPDATE Films SET Name = ? WHERE id = ?', (Name, row + 1))
-                cursor.execute('UPDATE Films SET Mark = ? WHERE id = ?', (Mark, row + 1))
+                cursor.execute('UPDATE Films SET Rate = ? WHERE id = ?', (Rate, row + 1))
                 cursor.execute('UPDATE Films SET Status = ? WHERE id = ?', (Status, row + 1))
                 cursor.execute('UPDATE Films SET Category = ? WHERE id = ?', (Category, row + 1))
                 cursor.execute('UPDATE Films SET Time_pole = ? WHERE id = ?', (Time_pole, row + 1))
@@ -103,10 +103,10 @@ class Saving(UI):
         else:
             self.config.set("application", "filter_name", "1")
 
-        if self.filter_mark.isChecked()==True:
-            self.config.set("application", "filter_mark", "0")
+        if self.filter_Rate.isChecked()==True:
+            self.config.set("application", "filter_Rate", "0")
         else:
-            self.config.set("application", "filter_mark", "1")
+            self.config.set("application", "filter_Rate", "1")
 
         if self.filter_status.isChecked()==True:
             self.config.set("application", "filter_status", "0")

@@ -1,10 +1,10 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QDialog, QLabel, QVBoxLayout, QAction, QSlider, QFileDialog, QMessageBox)
+from PyQt5.QtWidgets import (QDialog, QLabel, QVBoxLayout, QAction, QSlider, QFileDialog, QMessageBox,
+                             QScrollArea, QHBoxLayout, QWidget, QGridLayout, QScrollBar)
 from PyQt5.QtGui import QPalette, QColor
 from ui import *
 import adding
 import pandas as pd
-
 
 class Systems(UI):
     def __init__(self):
@@ -81,9 +81,9 @@ class Systems(UI):
         self.filter_name = QCheckBox(self.groupbox3)
         self.cr.create_textline(self.filter_name, 10, 20, 280, 40, 12)
 
-        # Filter "Mark"
-        self.filter_mark = QCheckBox(self.groupbox3)
-        self.cr.create_textline(self.filter_mark, 10, 50, 280, 40, 12)
+        # Filter "Rate"
+        self.filter_Rate = QCheckBox(self.groupbox3)
+        self.cr.create_textline(self.filter_Rate, 10, 50, 280, 40, 12)
 
         # Filter "Status"
         self.filter_status = QCheckBox(self.groupbox3)
@@ -253,9 +253,9 @@ class Systems(UI):
                     for i in range(0,data[self.filter_name.text()].size):
                         Name = data[self.filter_name.text()][i]
                         Status = data[self.filter_status.text()][i]
-                        Mark = data[self.filter_mark.text()][i]
+                        Rate = data[self.filter_Rate.text()][i]
                         Category = data[self.filter_category.text()][i]
-                        adding.Adding.add_without_check(adding.Adding(), Name, Mark, Status, Category, self.table, self.txt1)
+                        adding.Adding.add_without_check(adding.Adding(), Name, Rate, Status, Category, self.table, self.txt1)
                 QMessageBox.about(self.st_menu, "Результат загрузки", "Данные загружены")
             except Exception as ex:
                 QMessageBox.about(self.st_menu, "Результат загрузки", "Ошибка загрузки")
@@ -266,18 +266,18 @@ class Systems(UI):
                                                               QFileDialog.ShowDirsOnly)
                 path = dir_+'/My ILM list.xls'
                 Name = []
-                Mark = []
+                Rate = []
                 Status = []
                 Category = []
                 for row in range(0, self.table.rowCount()):
                     # Taking data from rows in table
                     Name.append((self.table.item(row, 0).text()))
-                    Mark.append((self.table.item(row, 1).text()))
+                    Rate.append((self.table.item(row, 1).text()))
                     Status.append(self.table.item(row, 2).text())
                     Category.append(self.table.item(row, 3).text())
                 data = pd.DataFrame(data = {self.filter_category.text(): Category,
                                      self.filter_name.text(): Name,
-                                     self.filter_mark.text(): Mark,
+                                     self.filter_Rate.text(): Rate,
                                      self.filter_status.text(): Status})
                 data.to_excel(path, engine='xlsxwriter')
                 QMessageBox.about(self.st_menu, "Результат выгрузки", "Данные выгружены")
@@ -294,13 +294,13 @@ class Systems(UI):
                 for row in range(0, self.table.rowCount()):
                     # Taking data from rows in table
                     Name = (self.table.item(row, 0).text())
-                    Mark = (self.table.item(row, 1).text())
+                    Rate = (self.table.item(row, 1).text())
                     Status = (self.table.item(row, 2).text())
                     Category = (self.table.item(row, 3).text())
-                    line = Category + ": " + Name + " (" + Status + " " + Mark + "/10)\n"
+                    line = Category + ": " + Name + " (" + Status + " " + Rate + "/10)\n"
                     lineLen = len(line)
                     if lineLen != maxLineLen:
-                        line =  Category+ ": " +Name + ("-"*(maxLineLen-lineLen))+ " (" + Status + " " + Mark + "/10)\n"
+                        line =  Category+ ": " +Name + ("-"*(maxLineLen-lineLen))+ " (" + Status + " " + Rate + "/10)\n"
                     file.write(line)
                 QMessageBox.about(self.st_menu, "Результат выгрузки", "Данные выгружены")
                 file.close()
@@ -317,10 +317,10 @@ class Systems(UI):
                             isCategory = True
                             isName = False
                             isStatus = False
-                            isMark = False
+                            isRate = False
                             Name = ""
                             Status = ""
-                            Mark = ""
+                            Rate = ""
                             Category = ""
 
                             for i in file:
@@ -334,9 +334,9 @@ class Systems(UI):
                                     continue
                                 if not (isName) and isStatus and i == " ":
                                     isStatus = False
-                                    isMark = True
+                                    isRate = True
                                     continue
-                                if not (isStatus) and isMark and i == "/":
+                                if not (isStatus) and isRate and i == "/":
                                     break
                                 if isCategory:
                                     Category+=i
@@ -344,10 +344,10 @@ class Systems(UI):
                                     Name+=i
                                 elif isStatus:
                                     Status+=i
-                                elif isMark:
-                                    Mark+=i
+                                elif isRate:
+                                    Rate+=i
 
-                            adding.Adding.add_without_check(adding.Adding(), Name, Mark, Status, Category, self.table, self.txt1)
+                            adding.Adding.add_without_check(adding.Adding(), Name, Rate, Status, Category, self.table, self.txt1)
                     QMessageBox.about(self.st_menu, "Результат загрузки", "Данные загружены")
                     f.close()
 
@@ -608,10 +608,20 @@ class Systems(UI):
     def info_win(self):
         # Info window for menu bar
         self.reply = QDialog()
-        self.reply.setFixedSize(380, 380)
+        self.reply.setFixedSize(550, 680)
 
-        vbox = QVBoxLayout()
-        label_dialog = QLabel()
+        label_dialog = QLabel(self.reply)
+
+        scroll = QScrollBar(self.reply)
+
+        # setting geometry of the scroll bar
+        scroll.setGeometry(535, 0, 15, 680)
+        scroll.setMaximum(400)
+        scroll.setMinimum(-20)
+        scroll.setValue(-20)
+
+        # making its background color to green
+        scroll.setStyleSheet("background : lightgrey;")
 
         self.reply.setWindowTitle("Information")
         self.reply.setWindowIcon(QIcon('..\\textures\\info.svg'))
@@ -623,19 +633,29 @@ class Systems(UI):
         # Setting window style
         label_dialog.setAutoFillBackground(True)
         label_dialog.setPalette(palette)
-        label_dialog.setAlignment(Qt.AlignCenter)
+        label_dialog.setAlignment(Qt.AlignLeft)
+        label_dialog.move(20,20)
 
+        scroll.valueChanged.connect(lambda: do_action())
         # Taking rows from file
-        f = open(os.path.abspath("..\\data\\Info.txt"), 'r')
-        text = ''
-        for i in f:
-            text += i
-        # Adding this rows
-        label_dialog.setText(text)
-
-        vbox.addWidget(label_dialog)
-        self.reply.setLayout(vbox)
+        with open(os.path.abspath("..\\data\\Info.txt"), 'r', encoding="utf-8") as f:
+            text = ''
+            for i in f:
+                text += i
+            # Adding this rows
+            label_dialog.setText(text)
+            f.close()
+        def do_action():
+            # getting current value of scroll bar
+            value = scroll.value()
+            # setting text to the label
+            label_dialog.move(20,-value)
+            print(label_dialog.pos())
+            # label_dialog.move(0, value)
         self.reply.exec()
+
+
+        # creating a action method
 
     def range_group(self):
         # This function is for creating objects in the group 1 (range deleting)

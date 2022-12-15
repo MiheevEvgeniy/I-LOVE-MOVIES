@@ -11,7 +11,7 @@ class Loading(UI):
         self.filter_time = None
         self.filter_category = None
         self.filter_status = None
-        self.filter_mark = None
+        self.filter_Rate = None
         self.filter_name = None
         self.config = None
 
@@ -64,10 +64,10 @@ class Loading(UI):
         else:
             self.filter_name.setChecked(True)
 
-        if self.config["application"]["filter_mark"] == '1':
-            self.filter_mark.setChecked(False)
+        if self.config["application"]["filter_Rate"] == '1':
+            self.filter_Rate.setChecked(False)
         else:
-            self.filter_mark.setChecked(True)
+            self.filter_Rate.setChecked(True)
 
         if self.config["application"]["filter_status"] == '1':
             self.filter_status.setChecked(False)

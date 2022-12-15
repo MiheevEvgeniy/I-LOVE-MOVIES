@@ -28,11 +28,11 @@ class Creating:
                         self.table.setRowCount(row)
                         cell = QTableWidgetItem(str(element))
                         self.table.setItem(row-1, col, cell)
-            # Selecting Mark column from db
-            cur.execute('SELECT Mark FROM Films')
+            # Selecting Rate column from db
+            cur.execute('SELECT Rate FROM Films')
             col = 1
             row = 0
-            # Adding mark data in table
+            # Adding Rate data in table
             for Film in cur.fetchall():
                 for element in Film:
                     cell = QTableWidgetItem(str(element))

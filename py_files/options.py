@@ -25,7 +25,7 @@ class Options(UI):
         self.filter_time = None
         self.filter_category = None
         self.filter_status = None
-        self.filter_mark = None
+        self.filter_Rate = None
         self.filter_name = None
         self.groupbox3 = None
         self.txtCreate = None
@@ -73,12 +73,12 @@ class Options(UI):
             self.groupbox3.setTitle("Filters")
 
             self.filter_name.setText("Name")
-            self.filter_mark.setText("Mark")
+            self.filter_Rate.setText("Rate")
             self.filter_status.setText("Status")
             self.filter_category.setText("Category")
             self.filter_time.setText("Date")
 
-            self.table.setHorizontalHeaderLabels(["Name", "Mark", "Status", "Category", "Date"])
+            self.table.setHorizontalHeaderLabels(["Name", "Rate", "Status", "Category", "Date"])
 
             self.btn1.setText("Add")
 
@@ -158,7 +158,7 @@ class Options(UI):
             self.groupbox3.setTitle("Фильтры")
 
             self.filter_name.setText("Название")
-            self.filter_mark.setText("Оценка")
+            self.filter_Rate.setText("Оценка")
             self.filter_status.setText("Статус")
             self.filter_category.setText("Категория")
             self.filter_time.setText("Дата")
@@ -220,8 +220,8 @@ class Options(UI):
                             # Filters checking
                             if self.filter_name.isChecked()==True:
                                 filter_sys.append("Name")
-                            if self.filter_mark.isChecked()==True:
-                                filter_sys.append("Mark")
+                            if self.filter_Rate.isChecked()==True:
+                                filter_sys.append("Rate")
                             if self.filter_status.isChecked()==True:
                                 filter_sys.append("Status")
                             if self.filter_category.isChecked()==True:
@@ -235,10 +235,10 @@ class Options(UI):
                                 else:
                                     request += str(i)+", "
                             # If all filters if on or off then add every filter
-                            if self.filter_name.isChecked()== True and self.filter_mark.isChecked()== True and\
+                            if self.filter_name.isChecked()== True and self.filter_Rate.isChecked()== True and\
                                 self.filter_status.isChecked()== True and self.filter_category.isChecked() == True\
                                     and self.filter_time.isChecked()==True or self.groupbox3.isChecked()==False:
-                                    request="Name, Mark, Status, Category, Time_pole"
+                                    request="Name, Rate, Status, Category, Time_pole"
                             if request=="":
                                 break
                             # Making request for db
