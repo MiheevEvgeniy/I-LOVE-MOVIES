@@ -152,20 +152,25 @@ class Systems(UI):
         self.lan.addItem("English")
         self.lan.setCurrentText(self.Current_lan)
 
+        self.styles = ["#ffffff","#ffffff","#ffffff","#ffffff","#ffffff"]
         def finishChoosingColor(element, color):
 
             if element == self.menubar_text:
                 newColor = "QMenuBar{background-color: " + color + ";}"
                 self.menubar.setStyleSheet(newColor)
+                self.styles[0] = color
             if element == self.table_borders_text:
                 self.borderStyle = "QTableWidget::item {border: 1px outset " + color + ";}"
                 self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
+                self.styles[1] = color
             if element == self.table_cells_text:
                 self.cellsStyle = "QTableWidget{background-color: " + color + ";}"
                 self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
+                self.styles[2] = color
             if element == self.table_head:
                 self.headStyle = "QHeaderView::section{background-color: " + color + ";}"
                 self.table.setStyleSheet(self.borderStyle + self.cellsStyle + self.headStyle)
+                self.styles[3] = color
             if element == self.progress_bar:
                 newColor = """
                     QProgressBar {
@@ -181,7 +186,8 @@ class Systems(UI):
                     }
                 """
                 self.pbar.setStyleSheet(newColor)
-
+                self.styles[4] = color
+            self.save_style(self.styles)
         self.color_lbl  = QLabel(self.colorAndLaguage)
         self.cr.create_textline(self.color_lbl, 30, 80, 200, 40, 16)
         self.color_lbl.setText(self.color_setting)
@@ -209,7 +215,7 @@ class Systems(UI):
             finishChoosingColor(self.table_cells_text, "white")
             finishChoosingColor(self.table_head, "white")
             finishChoosingColor(self.menubar_text, "white")
-            finishChoosingColor(self.progress_bar, "white")
+            finishChoosingColor(self.progress_bar, "#CD96CD")
 
         self.loadAndUploads = QGroupBox(self.st_menu)
         self.loadAndUploads.move(310, 20)
@@ -462,15 +468,13 @@ class Systems(UI):
                 self.color_plates[i].setPalette(pal)
                 self.color_plates[i].clicked.connect(lambda state, index=i, obj = self.color_plates[i]: miniColorBtn(index))
                 self.cr.create_button(self.color_plates[i], x, y, 25, 25, 12)
-                print(i)
-                print(self.color_plates[i])
-                print("---------------")
 
                 if i == 9:
                     x = 10
                     y += 40
                 else:
                     x += 30
+
             def miniColorBtn(index):
                 try:
                     hex_color = (self.color_conf["user_colors"]["col" + str(index + 1)])[1:]
@@ -500,6 +504,7 @@ class Systems(UI):
             self.save_color_plate = QPushButton(self.pcm)
             self.cr.create_button(self.save_color_plate, 10, 80, 300, 30, 16)
             self.save_color_plate.setText(self.ed_col_pl)
+
             self.save_color_plate.clicked.connect(lambda: self.save_color(self.red_txt.text(),
                                                                        self.green_txt.text(),
                                                                        self.blue_txt.text()))

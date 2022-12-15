@@ -35,6 +35,22 @@ class Saving(UI):
             self.color_conf.set("user_colors",
                                     "plates_filled",
                                     str(int(self.color_conf["user_colors"]["plates_filled"]) + 1))
+
+            with open(os.path.abspath("..\\data\\color_data.ini"), 'w') \
+                    as configfile:  # save
+                self.color_conf.write(configfile)
+        except Exception:
+            pass
+    def save_style(self, styles):
+        try:
+
+            self.color_conf.set("user_colors", "menu_bar", styles[0])
+            self.color_conf.set("user_colors", "table_borders", styles[1])
+            self.color_conf.set("user_colors", "table_cells", styles[2])
+            self.color_conf.set("user_colors", "table_head", styles[3])
+            self.color_conf.set("user_colors", "progress_bar", styles[4])
+
+
             with open(os.path.abspath("..\\data\\color_data.ini"), 'w') \
                     as configfile:  # save
                 self.color_conf.write(configfile)

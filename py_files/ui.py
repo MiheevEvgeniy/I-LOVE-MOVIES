@@ -121,7 +121,7 @@ class UI(object):
 
         # Check boxes
         self.type_adding_btn = QCheckBox(MW)
-        self.cr.create_textline(self.type_adding_btn, 40, 205, 200, 30, 12)
+        self.cr.create_textline(self.type_adding_btn, 25, 205, 200, 30, 14)
 
         # Progress bar
         self.pbar = QProgressBar(MW)

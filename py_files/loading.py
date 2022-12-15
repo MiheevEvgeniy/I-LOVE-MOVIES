@@ -30,6 +30,34 @@ class Loading(UI):
             except Exception as e:
                 print(e)
 
+    def load_styles(self):
+            borderStyle = "QTableWidget::item {border: 1px outset " + self.color_conf["user_colors"]["table_borders"] \
+                          + ";}"
+            cellsStyle = "QTableWidget{background-color: " + self.color_conf["user_colors"]["table_cells"] + ";}"
+            headStyle = "QHeaderView::section{background-color: " + self.color_conf["user_colors"]["table_head"] + ";}"
+            self.table.setStyleSheet(borderStyle + cellsStyle + headStyle)
+
+
+
+            pbar_style = """
+                                                    QProgressBar {
+                                                            border: 2px solid gray; 
+                                                            border-radius: 5px;
+                                                            text-align: center;
+                                                            font-size: 10px;
+                                                    }
+                                                    QProgressBar::chunk {
+                                                            background-color: """ + self.color_conf["user_colors"][
+                "progress_bar"] + ";""""
+                                                            width: 10px;
+                                                            margin: 0.5px;
+                                                    }
+                                            """
+            self.pbar.setStyleSheet(pbar_style)
+
+            newColor = "QMenuBar{background-color: " + self.color_conf["user_colors"]["menu_bar"] + ";}"
+            self.menubar.setStyleSheet(newColor)
+
     def load_settings(self):
         if self.config["application"]["filter_name"] == '1':
             self.filter_name.setChecked(False)

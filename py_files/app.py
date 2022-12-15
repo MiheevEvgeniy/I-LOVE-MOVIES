@@ -39,6 +39,7 @@ class App(QMainWindow, Options, Systems, Saving, Loading, Adding, Deleting, Crea
         self.config.read(os.path.abspath("..\data\config.ini"))
         self.color_conf.read(os.path.abspath("..\data\color_data.ini"))
         self.load_settings()
+        self.load_styles()
 
         if self.config["application"]["language"] == 'rus':
             self.Current_lan = "Русский"
