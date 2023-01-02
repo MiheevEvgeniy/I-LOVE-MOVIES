@@ -6,7 +6,11 @@ from PyQt5.QtWidgets import (QLineEdit, QProgressBar,
                              QListWidget, QGroupBox, QCheckBox)
 from PyQt5.QtGui import QIcon
 
+
 class UI(object):
+    def __init__(self):
+        self.program_path = None
+
     def init_UI(self, MW):
         # Main window
         self.cr = Creating()
@@ -14,11 +18,11 @@ class UI(object):
 
         self.WIDTH = 1120
         self.HEIGHT =600
-        self.center_w = root.winfo_reqwidth()*1.5
-        self.center_h = root.winfo_reqheight()*1.5
+        self.center_w = int(root.winfo_reqwidth()*1.5)
+        self.center_h = int(root.winfo_reqheight()*1.5)
         MW.setGeometry(self.center_w, self.center_h, self.WIDTH, self.HEIGHT)
         MW.setWindowTitle("I.L.M. - I LOVE MOVIES v0.4")
-        MW.setWindowIcon(QIcon(os.path.abspath("..\\textures\\ILF.ico")))
+        MW.setWindowIcon(QIcon(self.program_path +"\\textures\\ILF.ico"))
         MW.setFixedSize(self.WIDTH, self.HEIGHT)
 
         # Main lines (Name, Rate, Status, Category)
@@ -141,9 +145,11 @@ class UI(object):
                         }
                 """
         self.pbar.setStyleSheet(pbar_style)
+
+        background = (self.program_path + "\\textures\\background.jpg").replace('\\', '/')
         MW.setStyleSheet("""
                             QMainWindow {
-                                background-image: url("../textures/background.jpg");  
+                                background-image: url(""" + background + """);  
                             }
                         """)
         # Terminal for searching results

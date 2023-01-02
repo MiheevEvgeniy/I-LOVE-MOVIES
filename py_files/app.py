@@ -7,14 +7,17 @@ from saving import *
 from loading import *
 from adding import *
 from deleting import *
+from distutils.dir_util import copy_tree
 
 
 class App(QMainWindow, Options, Systems, Saving, Loading, Adding, Deleting, Creating):
     def __init__(self):
         super().__init__()
+
+        self.program_path = os.path.dirname(os.path.realpath(__file__))
+
         self.init_UI(self)
         self.btn1.clicked.connect(lambda: self.add_func())
-        self.txt1.editingFinished.connect(lambda : self.add_func())
         self.range_group()
         self.ran_b1.clicked.connect(lambda: self.range(self.ran_t1.text(), self.ran_t2.text()))
 
@@ -36,8 +39,8 @@ class App(QMainWindow, Options, Systems, Saving, Loading, Adding, Deleting, Crea
 
         self.config = configparser.ConfigParser()
         self.color_conf = configparser.ConfigParser()
-        self.config.read(os.path.abspath("..\data\config.ini"))
-        self.color_conf.read(os.path.abspath("..\data\color_data.ini"))
+        self.config.read(os.path.abspath(self.program_path + '\\data\\config.ini'))
+        self.color_conf.read(os.path.abspath(self.program_path + '\\data\\color_data.ini'))
         self.load_settings()
         self.load_styles()
 
@@ -65,24 +68,6 @@ class App(QMainWindow, Options, Systems, Saving, Loading, Adding, Deleting, Crea
         if close == QMessageBox.Cancel:
             event.ignore()
 
-
-# постеры или описание
-
-# сделать переключение между таблицами разных категорий
-# установить фон для терминала системы поиска
-
-# в настройках знак вопроса (иконка) - дать функционал
-# в русской версии сделать окно выхода тоже на русском (выбор - да, отмена)
-
-# окно для настроек(глобальных) и разбить на группы(основное, вид и т.д.):
-"""
-7) перевести информацию из таблицы в отдельный файл (txt, excel)
-"""
-
-# сделать apk и попробовать удалить бд
-# ЗАДЕЛ НА БУДУЩЕЕ!! КОРОЧ, СОЗДАТЬ ОТДЕЛЬНОЕ ОКНО С НАСТРОЙКАМИ
-# ВНЕШНЕГО ВИДА!!!!!!! ЦВЕТА, КАРТИНКИ ФОНА И Т.Д. ООААООАОАОАОАОАО
-# КОРОЧ, ЕЩЕ ОДНА КРУТАЯ ИДЕЯ!!!!!!! МОЖНО СОЗДАВАТЬ СТИИИИИИЛЛИИИИ!!! ОАОАОАОАОАОАОА
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

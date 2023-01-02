@@ -7,6 +7,7 @@ import pyodbc
 class Saving(UI):
     def __init__(self):
         super(Saving, self).__init__()
+        self.program_path = None
         self.hex_txt = None
         self.color_conf = None
         self.color_plates = None
@@ -36,7 +37,7 @@ class Saving(UI):
                                     "plates_filled",
                                     str(int(self.color_conf["user_colors"]["plates_filled"]) + 1))
 
-            with open(os.path.abspath("..\\data\\color_data.ini"), 'w') \
+            with open(os.path.abspath("data\\color_data.ini"), 'w') \
                     as configfile:  # save
                 self.color_conf.write(configfile)
         except Exception:
@@ -51,7 +52,7 @@ class Saving(UI):
             self.color_conf.set("user_colors", "progress_bar", styles[4])
 
 
-            with open(os.path.abspath("..\\data\\color_data.ini"), 'w') \
+            with open(self.program_path +"\\data\\color_data.ini", 'w') \
                     as configfile:  # save
                 self.color_conf.write(configfile)
         except Exception:
@@ -60,7 +61,7 @@ class Saving(UI):
         try:
             # Connecting to db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=..\data\ILF.accdb;'
+                         r'DBQ='+self.program_path + '\data\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cursor = conn.cursor()
             for row in range(0, self.table.rowCount()):
@@ -77,10 +78,9 @@ class Saving(UI):
                 cursor.execute('UPDATE Films SET Category = ? WHERE id = ?', (Category, row + 1))
                 cursor.execute('UPDATE Films SET Time_pole = ? WHERE id = ?', (Time_pole, row + 1))
             conn.commit()
-            print("норм все сохранилось")
             self.txt1.clear()
+            print("сохранил")
         except Exception as ex:
-            print("не дела...")
             print(ex)
     def save_settings(self):
         if self.groupbox3.isChecked()==True:
@@ -127,5 +127,5 @@ class Saving(UI):
             self.config.set("application", "check_add_func", "0")
         else:
             self.config.set("application", "check_add_func", "1")
-        with open(os.path.abspath("..\\data\\config.ini"), 'w') as configfile:  # save
+        with open(self.program_path +"\\data\\config.ini", 'w') as configfile:  # save
             self.config.write(configfile)

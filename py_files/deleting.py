@@ -4,6 +4,7 @@ from ui import *
 
 class Deleting(UI):
     def __init__(self):
+        self.program_path = None
         self.ran_t2 = None
         self.ran_t1 = None
         self.clearDeleteRate = None
@@ -13,7 +14,7 @@ class Deleting(UI):
         try:
             # Loading db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=..\data\ILF.accdb;'
+                         r'DBQ='+self.program_path + '\data\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cursor = conn.cursor()
             # Taking count of rows and deleting data from text line
@@ -26,7 +27,6 @@ class Deleting(UI):
                 cursor.execute('UPDATE Films SET id = ? WHERE id = ?', (txtchange-1, txtchange))
                 txtchange+=1
             conn.commit()
-            print("норм все")
             # Deleting data from table
             try:
                 for i in range(101):
@@ -38,10 +38,8 @@ class Deleting(UI):
                 self.pbar.setValue(0)
                 self.table.removeRow(int(txtval) - 1)
             except Exception as ex:
-                print("не дела...")
                 print(ex)
         except Exception as ex:
-            print("не дела...")
             print(ex)
     def list(self):
         try:
@@ -52,7 +50,6 @@ class Deleting(UI):
                 self.delete(self.list_nums[i]-change)
                 change+=1
         except Exception as ex:
-            print("не дела...")
             print(ex)
     def range(self, start, end):
         try:
@@ -61,5 +58,4 @@ class Deleting(UI):
                 self.delete(start)
                 time.sleep(0.005)
         except Exception as ex:
-            print("не дела...")
             print(ex)

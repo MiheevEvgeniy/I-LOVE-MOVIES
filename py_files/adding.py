@@ -9,6 +9,7 @@ from ui import *
 
 class Adding(UI):
     def __init__(self):
+        self.program_path = None
         self.list_t2 = None
         self.list_nums = None
         self.list_t1 = None
@@ -22,7 +23,7 @@ class Adding(UI):
                 vbox = QVBoxLayout()
                 label_dialog = QLabel()
                 self.reply.setWindowTitle("I.L.M.")
-                self.reply.setWindowIcon(QIcon(os.path.abspath("..\\textures\\ILF.ico")))
+                self.reply.setWindowIcon(QIcon(os.path.abspath(self.program_path + "\\textures\\ILF.ico")))
                 palette = QPalette()
                 palette.setColor(QPalette.Button, Qt.yellow)
 
@@ -56,17 +57,15 @@ class Adding(UI):
         try:
             # Connecting to db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=..\data\ILF.accdb;'
+                         r'DBQ='+os.path.dirname(os.path.realpath(__file__)) + '\data\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cursor = conn.cursor()
             # Adding data in db
             cursor.execute('INSERT INTO Films VALUES (?,?,?,?,?,?)',
                            table.rowCount() + 1, txtval1, txtval2, txtval3, txtval4, dt)
             conn.commit()
-            print("норм все")
             txt1.clear()
         except Exception as ex:
-            print("не дела...")
             print(ex)
         # Adding new line in table
         row = table.rowCount()
@@ -92,5 +91,4 @@ class Adding(UI):
 
             self.list_t1.clear()
         except Exception as ex:
-            print("не дела...")
             print(ex)

@@ -1,0 +1,154 @@
+Данная программа предназначена для пользователей, которые когда-либо
+сталкивались с проблемой хранения списка своих любимых книг, фильмов,
+сериалов или игр.Приложение обеспечивает ввод/вывод и хранение выших
+данных в удобном для человека формате.Сохранение данных производится
+автоматически, но при изменении данных в таблице, требуется сохранение.
+
+Навигация по интерфейсу:
+1. Область ввода находится в левом верхнем углу интерфейса и содержит
+   4 поля: название фильма, оценка, статус завершенности и тип данных.
+   Ниже данных полей находится кнопка ввода и галочка, которую пользователь
+   может поставить для включения функции проверки заполнения поля названия, либо
+   оставить элемент без галочки и работать без программной проверки поля;
+2. Правее области ввода находится область поиска и фильтрации поиска данных.
+   Поиск производитсяпо названию. Вывод результатов поиска производится в
+   терминал справа от строки поиска;
+3. В правом верхнем углу находится 2 области отвечающие за удаление данных:
+        3.1. Верхняя область производит удаление ОТ выбранного номера
+           элемента ДО другого выбранного номера элемента;
+        3.2. Нижняя область производит удаление выборочно. Пользователь может
+           составить список элементов, которые нужно удалить, а затем нажать
+           на кнопку удаления, исключив выбранные данные из таблицы и
+           хранилища данных.
+4. Таблица данных находится в нижней части экрана и содержит 5 столбцов: название,
+   оценку, статус, категорию, дату добавления элемента. Эта таблица является
+   основным объектов в интерфейсе и служит для наглядного и упорядоченного
+   отображения данных пользователя;
+5. Категория File панели управления программы находится слева от категории
+   Info (кнопки вызова данного окна) в левом верхнем углу приложения.
+   В этой категории вы можете 3 функции: выйти из приложения (может быть
+   вызвано сочетанием клавиш ctrl + q ОСНОРОЖНО! ЭТА ФУНКЦИЯ ЗАКРЫВАЕТ
+   ПРОГРАММУ БЕЗ СОХРАНЕНИЯ), сохранить данные (ctrl + s), открыть
+   настройки (ctrl + e). Содержание настроек:
+        5.1. Раздел визуальных настроек (слева):
+                5.1.1. Функция смена языка. Переводит программу
+                   на один из двух языков;
+                5.1.2. Изменение цвета элементов интерфейса. Для
+                   смены цвета в верхнем поле необходимо выбрать
+                   изменяемый элемент, после чего нажать кнопку
+                   "Сменить цвет" и выбрать желаемый цвет в
+                   палитре (при желании цвет можно сохранить в панели
+                   красок, нажав кнопку "Сохранить текущий цвет").
+                   После проведенных действий цвет элемента интерфейса
+                   будет изменен и окно выбора цвета можно будет закрыть.
+                   Для возвращения исходного стиля - нажмите на нижнюю кнопку
+                   категории смены цвета ("Тема по умолчанию").
+        5.2. Раздел загрузки и выгрузки данных:
+                5.2.1. Выгрузка в txt. Производит выгрузку в документ
+                   с расширением .txt в указанную пользователем папку.
+                5.2.2. Выгрузка в excel. Производит выгрузку в документ
+                   с расширением .xls вуказанную пользователем папку.
+                5.2.3. Загрузка из txt. Производит загрузку из документа
+                   с расширением .txt в таблицу приложения.
+                   Требования к организации документа загрузки:
+                       1) каждый загружаемый элемент должен быть
+                          на отдельной строке и содержать 4 типа
+                          данных - категория, название, статус, оценка;
+                       2) Формат строки должен иметь строго указанный вид:
+
+                                Категория: Название(Статус Оценка/10)
+
+                          ВАЖНО СТРОГОЕ СОБЛЮДЕНИЕ ПОСТАНОВКИ ПРОБЕЛОВ И
+                          СПЕЦИАЛЬНЫХ ЗНАКОВ! ЛЮБОЕ ОТКЛОНЕНИЕ ОТ ОБРАЗЦА
+                          МОЖЕТ ПРИВЕСТИ К НЕКОРРЕКТНОЙ ЗАГРУЗКЕ!
+
+                5.2.4. Загрузка из excel. Производит загрузку из документа
+                с расширением .xls или .xlsx в таблицу приложения.
+                   Требования к организации документа загрузки:
+                       1) Первая строка должна быть заголовками типов
+                          данных - категория, название, статус, оценка.
+                          Порядок не важен;
+                       2) Заголовки начинаются с заглавной буквы и
+                          называются: "Название", "Категория",
+                          "Оценка", "Статус";
+                       3) Данные идут под соответствующими столбцами
+                          вертикально вниз без пропусков (иначе
+                          пропуск будет добавлен в таблицу).
+
+
+This program is intended for users who have ever
+faced with the problem of keeping a list of their favorite books, movies,
+series or games. The application provides input / output and storage of your
+data in a human-friendly format. Data is stored
+automatically, but when changing the data in the table, saving is required.
+
+Interface navigation:
+1. The input area is located in the upper left corner of the interface and contains
+    4 fields: movie title, rating, completion status and data type.
+    Below these fields is an enter button and a checkmark that the user
+    can set to enable the function of checking the filling of the name field, or
+    leave the element unchecked and work without programmatically checking the field;
+2. To the right of the input area is the area for searching and filtering the search for data.
+    The search is made by name. The search results are displayed in
+    terminal to the right of the search bar;
+3. In the upper right corner there are 2 areas responsible for deleting data:
+         3.1. The upper area removes FROM the selected number
+            element BEFORE another selected element number;
+         3.2. The lower area performs deletion selectively. The user can
+            make a list of items to be removed, and then press
+            on the delete button, excluding the selected data from the table and
+            data stores.
+4. The data table is located at the bottom of the screen and contains 5 columns: name,
+    rating, status, category, date the item was added. This table is
+    the main objects in the interface and serves for a visual and orderly
+    displaying user data;
+5. The File category of the program control panel is located to the left of the category
+    Info (buttons for calling this window) in the upper left corner of the application.
+    In this category, you can 3 functions: log out of the application (can be
+    caused by the keyboard shortcut ctrl + q WARNING! THIS FUNCTION CLOSE
+    PROGRAM WITHOUT SAVE), save data (ctrl + s), open
+    settings (ctrl + e). Settings content:
+         5.1. Visual settings section (left):
+                 5.1.1. Language change function. translates the program
+                    into one of two languages;
+                 5.1.2. Changing the color of interface elements. For
+                    color change in the upper field must be selected
+                    element to change, and then click the button
+                    "Change color" and select the desired color in
+                    palette (if desired, the color can be saved in the panel
+                    colors by clicking the "Keep Current Color" button).
+                    After the actions taken, the color of the interface element
+                    will be changed and the color picker can be closed.
+                    To return the original style - click on the bottom button
+                    color change category ("Default Theme").
+         5.2. Data upload and download section:
+                 5.2.1. Upload to txt. Exports to a document
+                    with .txt extension to a user-specified folder.
+                 5.2.2. Upload to excel. Exports to a document
+                    with .xls extension to a user-specified folder.
+                 5.2.3. Loading from txt. Loads from a document
+                    with .txt extension to the application table.
+                    Requirements for the organization of the upload document:
+                        1) each uploaded item must be
+                           on a separate line and contain 4 types
+                           data - category, name, status, rating;
+                        2) The string format must have a strictly specified form:
+
+                                 Category: Name(Status Rate/10)
+
+                           IMPORTANT STRICT COMPLIANCE WITH GAP AND
+                           SPECIAL SIGNS! ANY DIFFERENCE FROM SAMPLE
+                           MAY CAUSE INCORRECT LOADING!
+
+                 5.2.4. Loading from excel. Loads from a document
+                 with .xls or .xlsx extension to the application table.
+                    Requirements for the organization of the upload document:
+                        1) The first line should be type headers
+                           data - category, title, status, rating.
+                           The order is not important;
+                        2) Headings start with a capital letter and
+                           called: "Name", "Category",
+                           "Rate", "Status";
+                        3) Data goes under the respective columns
+                           vertically down without gaps (otherwise
+                           the gap will be added to the table).

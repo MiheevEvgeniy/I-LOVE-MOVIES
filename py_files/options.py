@@ -5,6 +5,7 @@ import pyodbc
 class Options(UI):
     def __init__(self):
         super(Options, self).__init__()
+        self.program_path = None
         self.count_found_data = None
         self.search_terminal = None
         self.config = None
@@ -191,7 +192,7 @@ class Options(UI):
         try:
             # Connection to db
             con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};' \
-                         r'DBQ=..\data\ILF.accdb;'
+                         r'DBQ='+self.program_path + '\data\ILF.accdb;'
             conn = pyodbc.connect(con_string)
             cur = conn.cursor()
             # Selecting data from db
@@ -262,5 +263,4 @@ class Options(UI):
             self.found_data_value.setText(f"{self.count_found_data}")
             self.count_found_data = 0
         except Exception as ex:
-                print("не дела...")
                 print(ex)

@@ -1,3 +1,5 @@
+import errno
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDialog, QLabel, QVBoxLayout, QAction, QSlider, QFileDialog, QMessageBox,
                              QScrollArea, QHBoxLayout, QWidget, QGridLayout, QScrollBar)
@@ -9,6 +11,7 @@ import pandas as pd
 class Systems(UI):
     def __init__(self):
         super(Systems, self).__init__()
+        self.program_path = None
         self.color_setting = None
         self.clr_text = None
         self.color_conf = None
@@ -44,7 +47,7 @@ class Systems(UI):
 
         # Search button
         self.srch_b = QPushButton(self)
-        self.srch_b.setIcon(QIcon('..\\textures\\search.svg'))
+        self.srch_b.setIcon(QIcon(self.program_path +'\\textures\\search.svg'))
         self.cr.create_button(self.srch_b, 440, 30, 30, 30, 16)
 
         # Filters
@@ -100,22 +103,22 @@ class Systems(UI):
     def menu_bar(self):
         # Function for creating menu bar
         # Exit action
-        self.exit_action = QAction(QIcon('..\\textures\\exit.svg'), '&Exit', self)
+        self.exit_action = QAction(QIcon(self.program_path + '\\textures\\exit.svg'),'&Exit', self)
         self.exit_action.setShortcut('Ctrl+Q')
         self.exit_action.setStatusTip('Exit application')
 
         # Save action
-        self.save_action = QAction(QIcon('..\\textures\\save.svg'), '&Save', self)
+        self.save_action = QAction(QIcon(self.program_path +'\\textures\\save.svg'), '&Save', self)
         self.save_action.setShortcut('Ctrl+S')
         self.save_action.setStatusTip('Save all data')
 
         # Info action
-        self.info_action = QAction(QIcon('..\\textures\\info.svg'), '&Info', self)
+        self.info_action = QAction(QIcon(self.program_path +'\\textures\\info.svg'), '&Info', self)
         self.info_action.setShortcut('Ctrl+I')
         self.info_action.setStatusTip('Show information about program')
 
         # Settings action
-        self.settings_action = QAction(QIcon('..\\textures\\settings.svg'), '&Settings', self)
+        self.settings_action = QAction(QIcon(self.program_path +'\\textures\\settings.svg'), '&Settings', self)
         self.settings_action.setShortcut('Ctrl+E')
         self.settings_action.setStatusTip('Program settings')
 
@@ -135,7 +138,7 @@ class Systems(UI):
         self.st_menu = QDialog()
         self.st_menu.setFixedSize(540, 300)
         self.st_menu.setWindowTitle("Settings")
-        self.st_menu.setWindowIcon(QIcon('..\\textures\\settings.svg'))
+        self.st_menu.setWindowIcon(QIcon(self.program_path +'\\textures\\settings.svg'))
         self.st_menu.setWindowModality(Qt.ApplicationModal)
 
         self.colorAndLaguage = QGroupBox(self.st_menu)
@@ -248,39 +251,43 @@ class Systems(UI):
         def readXls():
             try:
                 dir_ = QFileDialog.getOpenFileName(None, 'Select a file:', 'C:\\')
-                if (dir_[0][-4:]) == ".xls" or (dir_[0][-4:]) == ".xlsx":
+                print( ((dir_[0][-4:]) == ".xls" or (dir_[0][-4:]) == ".xlsx" )and dir_[0] != "")
+                print(dir_[0] != "")
+                print( ((dir_[0][-4:]) == ".xls" or (dir_[0][-4:]) == ".xlsx"))
+                if ((dir_[0][-4:]) == ".xls" or (dir_[0][-4:]) == ".xlsx") and dir_[0] != "":
                     data = pd.read_excel(dir_[0], engine="openpyxl")
                     for i in range(0,data[self.filter_name.text()].size):
-                        Name = data[self.filter_name.text()][i]
-                        Status = data[self.filter_status.text()][i]
-                        Rate = data[self.filter_Rate.text()][i]
-                        Category = data[self.filter_category.text()][i]
+                        Name = str(data[self.filter_name.text()][i])
+                        Status = str(data[self.filter_status.text()][i])
+                        Rate = str(data[self.filter_Rate.text()][i])
+                        Category = str(data[self.filter_category.text()][i])
                         adding.Adding.add_without_check(adding.Adding(), Name, Rate, Status, Category, self.table, self.txt1)
-                QMessageBox.about(self.st_menu, "Результат загрузки", "Данные загружены")
+                    QMessageBox.about(self.st_menu, "Результат загрузки", "Данные загружены")
             except Exception as ex:
-                QMessageBox.about(self.st_menu, "Результат загрузки", "Ошибка загрузки")
+                QMessageBox.about(self.st_menu, "Результат загрузки", "Ошибка загрузки\n"+str(ex))
                 print(ex)
         def uploadXls():
             try:
                 dir_ = QFileDialog.getExistingDirectory(None, 'Select a folder:', 'C:\\',
                                                               QFileDialog.ShowDirsOnly)
-                path = dir_+'/My ILM list.xls'
-                Name = []
-                Rate = []
-                Status = []
-                Category = []
-                for row in range(0, self.table.rowCount()):
-                    # Taking data from rows in table
-                    Name.append((self.table.item(row, 0).text()))
-                    Rate.append((self.table.item(row, 1).text()))
-                    Status.append(self.table.item(row, 2).text())
-                    Category.append(self.table.item(row, 3).text())
-                data = pd.DataFrame(data = {self.filter_category.text(): Category,
-                                     self.filter_name.text(): Name,
-                                     self.filter_Rate.text(): Rate,
-                                     self.filter_status.text(): Status})
-                data.to_excel(path, engine='xlsxwriter')
-                QMessageBox.about(self.st_menu, "Результат выгрузки", "Данные выгружены")
+                if dir_ != "":
+                    path = dir_+'/My ILM list.xls'
+                    Name = []
+                    Rate = []
+                    Status = []
+                    Category = []
+                    for row in range(0, self.table.rowCount()):
+                        # Taking data from rows in table
+                        Name.append((self.table.item(row, 0).text()))
+                        Rate.append((self.table.item(row, 1).text()))
+                        Status.append(self.table.item(row, 2).text())
+                        Category.append(self.table.item(row, 3).text())
+                    data = pd.DataFrame(data = {self.filter_category.text(): Category,
+                                         self.filter_name.text(): Name,
+                                         self.filter_Rate.text(): Rate,
+                                         self.filter_status.text(): Status})
+                    data.to_excel(path, engine='xlsxwriter')
+                    QMessageBox.about(self.st_menu, "Результат выгрузки", "Данные выгружены")
             except Exception as ex:
                 QMessageBox.about(self.st_menu, "Результат выгрузки", "Ошибка выгрузки")
                 print(ex)
@@ -289,30 +296,31 @@ class Systems(UI):
             try:
                 dir_ = QFileDialog.getExistingDirectory(None, 'Select a folder:', 'C:\\',
                                                               QFileDialog.ShowDirsOnly)
-                file = open(dir_+'/My ILM list.txt','w')
-                maxLineLen = 70
-                for row in range(0, self.table.rowCount()):
-                    # Taking data from rows in table
-                    Name = (self.table.item(row, 0).text())
-                    Rate = (self.table.item(row, 1).text())
-                    Status = (self.table.item(row, 2).text())
-                    Category = (self.table.item(row, 3).text())
-                    line = Category + ": " + Name + " (" + Status + " " + Rate + "/10)\n"
-                    lineLen = len(line)
-                    if lineLen != maxLineLen:
-                        line =  Category+ ": " +Name + ("-"*(maxLineLen-lineLen))+ " (" + Status + " " + Rate + "/10)\n"
-                    file.write(line)
-                QMessageBox.about(self.st_menu, "Результат выгрузки", "Данные выгружены")
-                file.close()
+                if dir_ != "":
+                    file = open(dir_+'/My ILM list.txt','w')
+                    maxLineLen = 70
+                    for row in range(0, self.table.rowCount()):
+                        # Taking data from rows in table
+                        Name = (self.table.item(row, 0).text())
+                        Rate = (self.table.item(row, 1).text())
+                        Status = (self.table.item(row, 2).text())
+                        Category = (self.table.item(row, 3).text())
+                        line = Category + ": " + Name + " (" + Status + " " + Rate + "/10)\n"
+                        lineLen = len(line)
+                        if lineLen != maxLineLen:
+                            line =  Category+ ": " +Name + ("-"*(maxLineLen-lineLen))+ " (" + Status + " " + Rate + "/10)\n"
+                        file.write(line)
+                    QMessageBox.about(self.st_menu, "Результат выгрузки", "Данные выгружены")
+                    file.close()
             except Exception as ex:
                 QMessageBox.about(self.st_menu, "Результат выгрузки", "Ошибка выгрузки")
                 print(ex)
         def readTxt():
             try:
-                dir_ = QFileDialog.getOpenFileName(None, 'Select a file:', 'C:\\')
-                if (dir_[0][-4:]) == ".txt":
-                    with open(dir_[0], 'r', encoding="utf-8") as f:
+                dir_ = QFileDialog.getOpenFileName(None, 'Select a file:')
 
+                if (dir_[0][-4:]) == ".txt" and dir_[0] != "":
+                    with open(dir_[0], mode ='r', encoding="utf8") as f:
                         for file in f:
                             isCategory = True
                             isName = False
@@ -347,12 +355,12 @@ class Systems(UI):
                                 elif isRate:
                                     Rate+=i
 
-                            adding.Adding.add_without_check(adding.Adding(), Name, Rate, Status, Category, self.table, self.txt1)
+                            adding.Adding.add_without_check(adding.Adding(), Name[1:], Rate, Status, Category, self.table, self.txt1)
                     QMessageBox.about(self.st_menu, "Результат загрузки", "Данные загружены")
                     f.close()
 
             except Exception as ex:
-                QMessageBox.about(self.st_menu, "Результат загрузки", "Ошибка загрузки")
+                QMessageBox.about(self.st_menu, "Результат загрузки", "Ошибка загрузки\n"+str(ex))
                 print(ex)
         def pick_color_menu():
             # Info window for menu bar
@@ -616,7 +624,7 @@ class Systems(UI):
 
         # setting geometry of the scroll bar
         scroll.setGeometry(535, 0, 15, 680)
-        scroll.setMaximum(400)
+        scroll.setMaximum(1350)
         scroll.setMinimum(-20)
         scroll.setValue(-20)
 
@@ -624,7 +632,7 @@ class Systems(UI):
         scroll.setStyleSheet("background : lightgrey;")
 
         self.reply.setWindowTitle("Information")
-        self.reply.setWindowIcon(QIcon('..\\textures\\info.svg'))
+        self.reply.setWindowIcon(QIcon(self.program_path +'\\textures\\info.svg'))
         self.reply.setWindowModality(Qt.ApplicationModal)
 
         palette = QPalette()
@@ -638,7 +646,8 @@ class Systems(UI):
 
         scroll.valueChanged.connect(lambda: do_action())
         # Taking rows from file
-        with open(os.path.abspath("..\\data\\Info.txt"), 'r', encoding="utf-8") as f:
+        with open(os.path.abspath(self.program_path +"\\data\\Info.txt"),
+                  'r', encoding="utf-8") as f:
             text = ''
             for i in f:
                 text += i
@@ -650,7 +659,6 @@ class Systems(UI):
             value = scroll.value()
             # setting text to the label
             label_dialog.move(20,-value)
-            print(label_dialog.pos())
             # label_dialog.move(0, value)
         self.reply.exec()
 
